@@ -29,7 +29,7 @@ assert(css.includes('#tab-vocab .vocab-view-switch')&&css.includes('#tab-vocab #
 assert(read('js/core.js').includes("const VERSION='0.5.0'"));
 assert(read('js/core.js').includes("const KEY='toeic-trainer-v01:learning-state'"));
 assert(read('js/core.js').includes('const SCHEMA=1'));
-assert(read('sw.js').includes("const VERSION='toeic-trainer-independent-v0.5.1'"));
+assert(read('sw.js').includes("const VERSION='toeic-trainer-independent-v0.5.2'"));
 assert(html.includes('v0.5.1-independent-pwa-20261012'));
 for(const [f,sha] of Object.entries({
  'data/content.js':'c57f758c1e978e817397fbb76f54bbb2f8dd55f8d3600974ed0140af5d78cd4d',
@@ -38,7 +38,7 @@ for(const [f,sha] of Object.entries({
  'data/v041_progression.js':'2d0958ac4cd3b618ce460b58e6627dc6ec9280433dd671eae6cf39482e211ba5',
  'data/v042_official.js':'f47e870da1fb1b43c5e76664a9bfadf805cd53c28bf6a981c723ff0a83822ea4',
  'js/exam.js':'2d1ac55e1a1d41680a103babd99333e0d3144760b29bf56fe3c4530003f5ebc6',
- 'js/bridge.js':'9ccfd3781ebcb585e23168bbbbe13d7cd72fd6489f8c35ce3c0dd7b7e5dcfc6d',
+ 'js/bridge.js':'5c94fc658954466480b25deb6dff6c6537f813d2d17cafe6b956b1b19c5d9fbb',
 })){
  const actual=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,f))).digest('hex');
  assert.equal(actual,sha,'immutable '+f);

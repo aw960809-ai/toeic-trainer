@@ -43,7 +43,7 @@ assert.deepEqual(dom.dataset,{appearance:'dark',accent:'indigo',textSize:'large'
 assert.equal(prefs.load({getItem:()=>'{corrupt'}).accent,'slate','bad preference JSON safe fallback');
 assert.equal(prefs.normalize({appearance:'<script>',accent:'x',textSize:'n'}).accent,'slate','reject invalid style choices');
 assert.throws(()=>prefs.save({getItem(){return null},setItem(){throw new Error('quota')}},value),/quota/);
-assert.equal(sw.includes('toeic-trainer-independent-v0.5.1'),true);
+assert.equal(sw.includes('toeic-trainer-independent-v0.5.2'),true);
 assert.equal(sw.includes("'./css/preferences-v0433.css'"),true);
 assert.equal(sw.includes("'./js/preferences.js'"),true);
 assert(read('js/core.js').includes("const KEY='toeic-trainer-v01:learning-state'"));
@@ -60,7 +60,7 @@ const frozen={
 'data/v041_progression.js':'2d0958ac4cd3b618ce460b58e6627dc6ec9280433dd671eae6cf39482e211ba5',
 'data/v042_official.js':'f47e870da1fb1b43c5e76664a9bfadf805cd53c28bf6a981c723ff0a83822ea4',
 'js/exam.js':'2d1ac55e1a1d41680a103babd99333e0d3144760b29bf56fe3c4530003f5ebc6',
-'js/bridge.js':'9ccfd3781ebcb585e23168bbbbe13d7cd72fd6489f8c35ce3c0dd7b7e5dcfc6d'
+'js/bridge.js':'5c94fc658954466480b25deb6dff6c6537f813d2d17cafe6b956b1b19c5d9fbb'
 };
 for(const [file,hash] of Object.entries(frozen))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex'),hash,file);
 console.log('PASS: V0.5.0 settings hub, theme persistence, analysis routing, safe boundaries and immutable study banks.');

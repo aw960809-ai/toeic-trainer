@@ -81,7 +81,7 @@ assert(html.indexOf('js/length-policy.js')<html.indexOf('js/app.js'));
 const app=read('js/app.js');
 for(const str of ['...V041.questions','...V041.readingLessons','LengthPolicy.audit','updateReadingLevelOptions','practiceTier','pickNextArticle'])assert(app.includes(str),str);
 const sw=read('sw.js');
-assert(sw.includes("const VERSION='toeic-trainer-independent-v0.5.1'"));
+assert(sw.includes("const VERSION='toeic-trainer-independent-v0.5.2'"));
 assert(sw.includes("'./data/v041_progression.js'"));
 assert(sw.includes("'./js/length-policy.js'"));
 for(const f of ['js/app.js','js/core.js','js/bank-audit.js','js/length-policy.js','data/v041_progression.js']){

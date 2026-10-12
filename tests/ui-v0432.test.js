@@ -48,7 +48,7 @@ for(const [file,sum] of Object.entries(frozen)){
 assert(read('js/core.js').includes("const VERSION='0.5.0'"));
 assert(read('js/core.js').includes("const KEY='toeic-trainer-v01:learning-state'"));
 assert(read('js/core.js').includes('const SCHEMA=1'));
-assert(read('sw.js').includes("const VERSION='toeic-trainer-independent-v0.5.1'"));
+assert(read('sw.js').includes("const VERSION='toeic-trainer-independent-v0.5.2'"));
 assert(html.includes('v0.5.1-independent-pwa-20261012'));
 for(const s of ['localStorage.clear(', 'indexedDB.deleteDatabase(', 'lawLangGoalSystemV92'])assert(!app.includes(s));
 console.log('PASS: 0.5.0 reading, grammar & vocab direct controls; unique 20 topics, original bank, exam engine and personal history preserved.');

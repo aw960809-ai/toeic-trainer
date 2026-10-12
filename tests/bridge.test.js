@@ -18,8 +18,8 @@ function session(n,overrides={}){
 }
 function goals(logs=[],edits=[]){
  const tasks=[
-  {id:'g3',name:'語言能力準備',level:1,parent:null,status:'進行中'},
-  {id:'g3-2026-integrated',name:'TOEIC｜10–12 月整合準備',level:2,parent:'g3',status:'進行中'},
+  {id:'toeic-direction-2026',name:'TOEIC 多益英文能力準備',level:1,parent:null,status:'進行中'},
+  {id:'g3-2026-integrated',name:'TOEIC｜10–12 月整合準備',level:2,parent:'toeic-direction-2026',status:'進行中'},
   {id:'g3-2026-10',name:'10月學習',level:3,parent:'g3-2026-integrated',status:'進行中',start:'2026-10-01',due:'2026-11-01'},
   {id:'g3-2026-10-practice',name:'題目＋檢討',level:4,parent:'g3-2026-10',status:'進行中',weeklyMinutes:30}
  ];
@@ -54,6 +54,14 @@ function goals(logs=[],edits=[]){
  const signedSnapshot=await Bridge.readGoalSnapshot(JSON.stringify(signed));
  assert.equal(signedSnapshot.taskCount,4,'Valid GM SHA-256 must be accepted');
  assert.equal(Bridge.preview([session(1)],{now,snapshot:snap}).counts.candidate,1);
+ const oldRoot=await Bridge.readGoalSnapshot(goals([], [
+   ['toeic-direction-2026',{id:'g3',name:'語言能力準備'}],
+   ['g3-2026-integrated',{parent:'g3'}]
+ ]));
+ assert.equal(
+   Bridge.preview([session(1)],{now,snapshot:oldRoot}).counts.hold,1,
+   'Old g3 root must not be accepted'
+ );
  assert.equal(Bridge.preview([session(1),session(1)],{now,snapshot:snap}).counts.excluded,2);
  assert.equal(Bridge.preview([session(1,{seconds:0})],{now}).counts.excluded,1);
  assert.equal(Bridge.preview([session(1,{seconds:59})],{now}).counts.excluded,1);
@@ -69,6 +77,16 @@ function goals(logs=[],edits=[]){
  assert.equal(Bridge.preview([session(1),session(1,{id:'tt-different-event',createdAt:session(1).createdAt})],{now}).counts.hold,2);
  const duplicate=await Bridge.readGoalSnapshot(goals([{id:'log-one',sourceEventId:session(1).id,actual:true,kind:'goal-study',minutes:2,taskId:'g3-2026-10-practice',time:'2026-10-11T10:00:00Z'}]));
  assert.match(Bridge.preview([session(1)],{now,snapshot:duplicate}).rows[0].reason,/相同事件/);
+ const existingAuto=await Bridge.readGoalSnapshot(goals([{
+   id:'toeic-sync-'+session(1).id,
+   actual:true,kind:'goal-study',minutes:2,
+   taskId:'g3-2026-10-practice',
+   time:'2026-10-11T10:00:00Z'
+ }]));
+ assert.match(
+   Bridge.preview([session(1)],{now,snapshot:existingAuto}).rows[0].reason,
+   /相同事件/
+ );
  const manual=await Bridge.readGoalSnapshot(goals([{id:'log-two',source:'manual-backfill',actual:true,kind:'goal-study',minutes:3,taskId:'g3-2026-10-practice',time:'2026-10-11T09:00:00Z'}]));
  assert.match(Bridge.preview([session(1)],{now,snapshot:manual}).rows[0].reason,/同一 Level 4/);
  const missing=await Bridge.readGoalSnapshot(goals([], [['g3-2026-10-practice',{status:'已封存'}]]));
@@ -91,7 +109,7 @@ function goals(logs=[],edits=[]){
  assert.equal(Core.KEY,'toeic-trainer-v01:learning-state'); assert.equal(Core.SCHEMA,1);
  const html=fs.readFileSync(path.join(root,'index.html'),'utf8'),app=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
  assert(html.includes('id="bridgePanel"')&&html.includes('id="exportBridgeCandidates"'));
- assert(html.includes('src="./js/bridge.js?v=v0.5.1-independent-pwa-20261012"'));
+ assert(html.includes('src="./js/bridge.js?v=v0.5.2-goal-backup-review-20261012"'));
  assert(app.includes('goalSnapshot=await Bridge.readGoalSnapshot(await file.text())'));
  assert(app.includes('goalSnapshot=null;bridgeSelected.clear()'));
  for(const blocked of ['lawLangGoalSystemV92','indexedDB.deleteDatabase(','localStorage.clear(','fetch(','localStorage.setItem(\'lawLang']){

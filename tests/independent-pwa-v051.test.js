@@ -23,7 +23,7 @@ const t=new Date('2026-10-12T10:00:00Z');
 assert.equal(Auto.enable(store,{location:{protocol:'https:',pathname:'/toeic-trainer/',href:'https://aw960809-ai.github.io/toeic-trainer/'},now:t}).enabledAt,t.toISOString());
 assert(storeData.has(legacyKey),'no deletion or overwrite of historical consent');
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
-assert(sw.includes('toeic-trainer-independent-v0.5.1'));
+assert(sw.includes('toeic-trainer-independent-v0.5.2'));
 assert(sw.includes("const OWN_PREFIX='toeic-trainer-independent-'"),'must not delete legacy PWA cache');
 const workflow=fs.readFileSync(path.join(root,'.github/workflows/pages.yml'),'utf8');
 assert(workflow.includes('npm test')&&workflow.includes('actions/deploy-pages@v4'));

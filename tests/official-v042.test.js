@@ -91,7 +91,7 @@ const wrongMock={...def,part7multiple:[...def.part7multiple.slice(0,24),def.part
 assert(!Exam.validateMock(all,wrongMock).ok,'duplicate in 100-item mock rejected');
 const html=read('index.html'),app=read('js/app.js'),sw=read('sw.js');
 for(const name of ['v0.5.1-independent-pwa-20261012','id="startOfficialMock"','id="draftBanner"','id="savedReviewDialog"','data/v042_official.js','js/exam.js','js/quality-review.js'])assert(html.includes(name),name);
-assert(sw.includes('toeic-trainer-independent-v0.5.1'));assert(sw.includes("'./data/v042_official.js'"));
+assert(sw.includes('toeic-trainer-independent-v0.5.2'));assert(sw.includes("'./data/v042_official.js'"));
 for(const expected of ['function finishQuiz(timedOut=false)','function finishReadingLesson()','function startOfficialMock()','Exam.score(','Exam.answer(','reviewSection(','finishReadingLesson()','finishQuiz(false)'])assert(app.includes(expected),expected);
 for(const sensitive of ['localStorage.clear(','indexedDB.deleteDatabase(','lawLangGoalSystemV92','window.ToeicTrainerNews'])for(const src of ['js/app.js','js/exam.js','js/quality-review.js','data/v042_official.js'])assert(!read(src).includes(sensitive),src+' touches unsafe boundary');
 console.log('PASS: V0.4.2 official 100/75 blueprint, 53 independently authored items, full-submit deferred scoring, session stability and strict source audit.');
