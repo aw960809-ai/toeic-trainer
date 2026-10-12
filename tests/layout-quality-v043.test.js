@@ -53,6 +53,6 @@ for(const forbidden of ['localStorage.clear(','indexedDB.deleteDatabase(','lawLa
 assert(read('js/core.js').includes("const VERSION='0.5.0'"));
 assert(read('js/core.js').includes("const KEY='toeic-trainer-v01:learning-state'"));
 assert(read('js/core.js').includes('const SCHEMA=1'));
-assert(read('sw.js').includes('toeic-trainer-independent-v0.5.1'));
+assert(read('sw.js').includes('toeic-trainer-independent-v0.5.2'));
 for(const f of ['./css/layout-v043.css','./js/quality-v043.js'])assert(read('sw.js').includes(`'${f}'`));
 console.log(`PASS: V0.4.3 UI and 640-item machine audit; ${report.counts.flaggedForReview} review-priority items; all original IDs/storage/submit-only safety preserved.`);

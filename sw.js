@@ -1,5 +1,5 @@
 /* Strictly scoped to the new independent TOEIC Trainer PWA. */
-const VERSION='toeic-trainer-independent-v0.5.1';
+const VERSION='toeic-trainer-independent-v0.5.2';
 const OWN_PREFIX='toeic-trainer-independent-';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./css/style.css','./css/layout-v043.css','./css/preferences-v0433.css','./data/content.js','./data/advanced.js','./data/v04_bank.js','./data/v041_progression.js','./data/v042_official.js','./js/core.js','./js/bridge.js','./js/bank-audit.js','./js/length-policy.js','./js/exam.js','./js/quality-review.js','./js/quality-v043.js','./js/preferences.js','./js/app.js','./js/auto-sync.js'];
 self.addEventListener('install',e=>{

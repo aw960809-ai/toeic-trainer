@@ -77,15 +77,16 @@
     if(parent.status==='已封存'||session.date<parent.start||session.date>parent.due)
       return {reason:'學習日期不在目前子任務的有效期間內。'};
     const phase=snapshot.tasks.get(String(parent.parent||'')),direction=phase&&snapshot.tasks.get(String(phase.parent||''));
-    if(!phase||Number(phase.level)!==2||phase.id!=='g3-2026-integrated'||phase.status==='已封存'||!direction||direction.id!=='g3'||Number(direction.level)!==1||direction.status==='已封存')
-      return {reason:'目標階層與既有 TOEIC 整合準備計畫不符，請人工核對。'};
+    if(!phase||Number(phase.level)!==2||phase.id!=='g3-2026-integrated'||phase.status==='已封存'||!direction||direction.id!=='toeic-direction-2026'||Number(direction.level)!==1||direction.status==='已封存')
+      return {reason:'目標階層與 TOEIC 獨立方向不符；請使用 Goal Manager V98.13.8 或更新版本的完整備份並核對目標階層。'};
     if(!taskId.endsWith('-'+session.unit))return {reason:'訓練類別與目前 Level 4 目標不符。'};
     return {taskId,name:String(task.name||''),period:parent.start+' ～ '+parent.due};
   }
   function originRecordMatch(log,id){
     if(!log||typeof log!=='object')return false;
     return ['sourceEventId','eventId','sourceLearningEventId','externalEventId','sourceLegacyLogId'].some(k=>String(log[k]||'')===id)
-      || String(log.id||'')==='toeic-import-'+id;
+      || String(log.id||'')==='toeic-import-'+id
+      || String(log.id||'')==='toeic-sync-'+id;
   }
   function analyzeOne(session,{nowMs,today,snapshot}){
     const problems=[],s=session&&typeof session==='object'?session:{};
