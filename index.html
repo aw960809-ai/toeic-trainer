@@ -218,22 +218,22 @@
       <div class="settings-section-group">
         <details class="panel settings-fold" id="settingsDataPanel"><summary><span>資料與備份</span><small>匯出、還原、事件核對</small></summary><div class="settings-fold-body"><div class="section-title"><div><small>DATA OWNERSHIP</small><h2>備份與資料交換</h2></div></div>
         <p class="muted">匯出的是這套新程式的紀錄，絕不包含 Goal Manager 原始資料。可在這裡還原訓練端自己的備份；不支援匯入其他來源資料。</p>
-        <div class="button-row"><button id="exportBackup" class="btn btn-primary">下載完整訓練備份</button><button id="exportEvents" class="btn btn-light">開啟事件核對</button><button id="importBackupBtn" class="btn btn-light">匯入此程式備份</button></div>
+        <div class="button-row"><button id="exportBackup" class="btn btn-primary">下載完整訓練備份</button><button id="exportEvents" class="btn btn-light">進階事件核對（選用）</button><button id="importBackupBtn" class="btn btn-light">匯入此程式備份</button></div>
         <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
         <p class="fineprint">新版同網站版本具備經驗證的自動匯入器（需先啟用），請勿把本檔直接匯入 Goal Manager 的「完整備份還原」功能。</p>
       </div></details>
       </div>
       <div class="settings-section-group" id="toeicAutoLinkPanel">
         <details class="panel settings-fold" id="autoSyncDetails"><summary><span>Goal Manager 自動連動</span><small>同網站 · 開啟時安全入帳</small></summary>
-          <div class="settings-fold-body"><h2>新學習紀錄自動連動</h2>
-            <p class="muted">第一次請從原本 localhost 的 Trainer 下載完整訓練備份，再到 Goal Manager 同網域的 Trainer 還原一次。兩個網址的儲存空間不同；舊 Session 保留，但不會自動回填進度。</p>
+          <div class="settings-fold-body"><h2>學習成果自動連動</h2>
+            <p class="muted">第一次請從原本 localhost 的 Trainer 下載完整訓練備份，再到 Goal Manager 同網域的 Trainer 還原一次。兩個網址的儲存空間不同；已還原至同網站 Trainer 的歷史 Session，會由 Goal Manager 自動核對有效成果。</p>
             <p id="autoSyncStatus" class="fineprint" role="status">正在檢查連動狀態</p>
-            <div class="button-row"><button id="autoSyncToggle" type="button" class="btn btn-primary">啟用新練習自動連動</button><a id="autoSyncOpenGoal" class="btn btn-light" href="../../">開啟 Goal Manager ↗</a></div>
-            <p class="fineprint">只有本頁確認「啟用」後的新正式交卷，且超過 60 秒、符合既有 Level 4 計畫的事件，才由目標系統入帳。同日人工補登或時間重疊的事件不會自動入帳。正確率只留在訓練端。</p>
+            <div class="button-row"><button id="autoSyncToggle" type="button" class="btn btn-primary">啟用學習成果自動連動</button><a id="autoSyncOpenGoal" class="btn btn-light" href="../../">開啟 Goal Manager ↗</a></div>
+            <p class="fineprint">本頁啟用一次後，Goal Manager 開啟或切回時，會自動核對已存在及新增、達 60 秒且符合 Level 4 目標的正式交卷事件。同日人工補登或時間重疊的事件安全暫緩；正確率仍只保留在訓練端。</p>
           </div></details>
       </div>
       <div class="settings-section-group" id="settingsGoalTools">
-        <details class="panel integration-disclosure" id="bridgeDisclosure"><summary><span><b>學習成果安全連結</b><small>備援核對 · 訓練端不直接寫目標</small></span><span class="disclosure-chevron" aria-hidden="true">⌄</span></summary>
+        <details class="panel integration-disclosure" id="bridgeDisclosure"><summary><span><b>進階：歷史事件核對（非必要）</b><small>僅疑難排查時使用，平時不需操作</small></span><span class="disclosure-chevron" aria-hidden="true">⌄</span></summary>
       <div id="bridgePanel" class="disclosure-content">
         <div class="section-title"><div><small>V0.3 · READ-ONLY LINK PREVIEW</small><h2>學習成果安全連結預覽</h2></div></div>
         <p class="muted">第一階段只核對、不匯入。若提供 Goal Manager 匯出的完整 JSON 備份，系統會在本機記憶體檢查目標期間、相同事件及同日可能重複補登；不會讀取、覆蓋或還原另一套系統的資料。</p>
@@ -249,7 +249,7 @@
       </div>
       </details>
         <details class="panel settings-fold" id="settingsGoalGuide"><summary><span>目標系統使用說明</span><small>保留手動核對備援</small></summary><div class="settings-fold-body"><div class="section-title"><div><small>GOAL MANAGER</small><h2>如何記入現有目標</h2></div></div>
-        <p>先在上方完成逐筆事件核對，確認是否與既有目標紀錄重複。啟用新版同網站連動後，新完成的有效學習會在開啟 Goal Manager 時自動核對與計入。手動匯出／核對保留為備援，不能對同一段時間重複補登。</p>
+        <p>在「Goal Manager 自動連動」啟用一次即可。Goal Manager 開啟或切回時自動核對符合條件的新舊成果，並排除重複事件；不必逐筆下載或提供目標備份。進階核對僅供疑難排查。</p>
         <a class="text-link" href="https://aw960809-ai.github.io/my-goal-manager/" target="_blank" rel="noopener noreferrer">開啟既有目標系統 ↗</a>
       </div></details>
         <details class="panel architecture-disclosure"><summary><span><small>LEARNING RECORD</small><b>學習紀錄與目標系統</b></span><span class="disclosure-chevron" aria-hidden="true">⌄</span></summary>

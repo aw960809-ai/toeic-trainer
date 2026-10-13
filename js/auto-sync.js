@@ -41,12 +41,12 @@
   function statusText(window){
     if(!hosted(window.location))return '本機模式：資料仍在此瀏覽器。自動連動需從 Goal Manager 網站開啟已部署的訓練版。';
     const settings=read(window.localStorage);
-    if(!settings?.enabled)return '尚未啟用。啟用後只同步此時間點以後完成、達 60 秒的正式交卷紀錄。';
+    if(!settings?.enabled)return '尚未啟用。啟用後會自動核對符合條件的歷史與新增正式交卷紀錄。';
     let receipt=null;
     try{receipt=JSON.parse(window.localStorage.getItem(STATUS_KEY)||'null')}catch(_){}
     if(!receipt)return '自動連動已啟用；請開啟 Goal Manager 接收新完成的訓練。';
     if(receipt.blocked)return '目標系統尚未接收：'+receipt.blocked;
-    return `連動已啟用 · 目標端上次接收 ${Number(receipt.addedCount)||0} 筆、${Number(receipt.added)||0} 分；待核對 ${Number(receipt.held)||0} 筆。`;
+    return `自動連動已啟用 · 上次新增 ${Number(receipt.addedCount)||0} 筆、${Number(receipt.added)||0} 分；安全暫緩 ${Number(receipt.held)||0} 筆。`;
   }
   function notifyCompleted(event,{window}={}){
     // Called ONLY AFTER the Trainer state passed its durable write verification.
@@ -75,7 +75,7 @@
       try{
         if(read(window.localStorage)?.enabled){disable(window.localStorage)}
         else{
-          const ok=window.confirm('啟用後，只有此刻以後完成、且經驗證的訓練 Session 才會在 Goal Manager 開啟時自動計入。\n\n舊紀錄不會被自動補登。重複或疑似重疊的事件會暫停核對。\n\n確定啟用嗎？');
+          const ok=window.confirm('啟用後 Goal Manager 會在開啟或切回時，自動核對已存在及新增的有效訓練紀錄，無需逐筆匯入。\n\n同日人工紀錄、事件重複或學習時間疑似重疊者會安全暫緩，不重複入帳。\n\n確定啟用嗎？');
           if(!ok)return;
           enable(window.localStorage,{location:window.location});
         }
