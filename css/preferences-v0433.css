@@ -186,3 +186,19 @@ html[data-appearance="dark"]{
 #tab-settings .settings-fold .settings-fold-body{padding:8px 12px 12px}
 #tab-settings #settingsInformation .settings-section{padding:12px}
 #tab-settings #settingsGoalTools .integration-disclosure>summary{font-size:13px}
+/* EMBEDDED-TOEIC-INFO-FOLD: rare quality/technical metadata collapsed. */
+#tab-settings #settingsInformation.tt-information-fold{
+  padding:0;margin:0 0 9px;border:1px solid var(--line);
+  border-radius:12px;background:var(--paper);box-shadow:none;overflow:hidden}
+#tab-settings #settingsInformation.tt-information-fold>summary{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  min-height:46px;padding:10px 12px;list-style:none;cursor:pointer;
+  color:var(--ink);font-size:13px;font-weight:650;line-height:1.5}
+#tab-settings #settingsInformation.tt-information-fold>summary::-webkit-details-marker{display:none}
+#tab-settings #settingsInformation.tt-information-fold>summary small{
+  font-size:11px;color:var(--mute);font-weight:450;text-align:right;line-height:1.4}
+#tab-settings #settingsInformation.tt-information-fold>.settings-section{
+  margin:0;padding:12px;border:0;border-top:1px solid var(--line);
+  border-radius:0;box-shadow:none;background:var(--paper)}
+#tab-settings #settingsInformation.tt-information-fold>summary:focus-visible{
+  outline:3px solid var(--focus);outline-offset:-3px}
