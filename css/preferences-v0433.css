@@ -163,8 +163,6 @@ html[data-appearance="dark"]{
   border-radius:11px;color:var(--mute);font-size:13px;line-height:1.55}
 #toeicSuiteAppearanceHint p{margin:0 0 7px;line-height:1.5}
 #toeicSuiteAppearanceHint a{color:var(--sage);font-weight:650;text-decoration:underline}
-#tab-settings .settings-heading{margin:6px 0 11px}
-#tab-settings .settings-heading h1{font-size:20px}
 #tab-settings .settings-heading p{font-size:13px;line-height:1.5}
 /* SUITE-SETTINGS-IA-V3: display frequent tools first, advanced checks last. */
 #tab-settings:not([hidden]){display:flex;flex-direction:column;gap:8px}

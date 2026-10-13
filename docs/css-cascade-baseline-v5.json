@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "project": "toeic",
+  "linked_stylesheets": [
+    "css/style.css",
+    "css/layout-v043.css",
+    "css/preferences-v0433.css",
+    "css/ui-layout-v4.css"
+  ],
+  "files": {
+    "css/layout-v043.css": {
+      "bytes": 25949,
+      "blocks": 335,
+      "important": 41,
+      "duplicate_scoped_rules": 5,
+      "duplicate_declarations": 0
+    },
+    "css/preferences-v0433.css": {
+      "bytes": 15419,
+      "blocks": 134,
+      "important": 41,
+      "duplicate_scoped_rules": 3,
+      "duplicate_declarations": 0
+    },
+    "css/style.css": {
+      "bytes": 22761,
+      "blocks": 313,
+      "important": 8,
+      "duplicate_scoped_rules": 0,
+      "duplicate_declarations": 0
+    },
+    "css/ui-layout-v4.css": {
+      "bytes": 8065,
+      "blocks": 95,
+      "important": 19,
+      "duplicate_scoped_rules": 0,
+      "duplicate_declarations": 0
+    }
+  }
+}
