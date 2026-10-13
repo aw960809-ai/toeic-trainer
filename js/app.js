@@ -142,6 +142,9 @@ function syncVisualSettings(){
   const local=byId('toeicLocalAppearanceControls'),hint=byId('toeicSuiteAppearanceHint');
   if(local)local.hidden=!!suite;
   if(hint)hint.hidden=!suite;
+  const appearancePanel=byId('settingsAppearancePanel'),strip=byId('toeicSuiteAppearanceStrip');
+  if(appearancePanel)appearancePanel.hidden=!!suite;
+  if(strip)strip.hidden=!suite;
   Prefs.apply(document.documentElement,visualPrefs);
   for(const [group,field] of [['settingsAppearanceButtons','appearance'],['settingsAccentButtons','accent'],['settingsTextSizeButtons','textSize']]){
     byId(group)?.querySelectorAll('button').forEach(button=>{

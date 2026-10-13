@@ -79,4 +79,11 @@ assert(html.includes('id="toeicLocalAppearanceControls"'));
 assert(html.includes('id="toeicSuiteAppearanceHint"'));
 assert.equal(prefs.SUITE_KEY,'gm-suite:appearance-v1');
 assert(skin.includes('SUITE-SETTINGS-UI-V1'));
+// IA V3: independent settings still exist, but shared appearance is not duplicated.
+assert(html.includes('id="toeicSuiteAppearanceStrip"'));
+assert(app.includes('appearancePanel.hidden=!!suite'));
+assert(app.includes('strip.hidden=!suite'));
+assert(skin.includes('SUITE-SETTINGS-IA-V3'));
+assert(skin.includes('#tab-settings>#toeicAutoLinkPanel{order:1}'));
+assert(skin.includes('#tab-settings>#settingsGoalTools{order:6}'));
 console.log('PASS: V0.5.0 settings hub, theme persistence, analysis routing, safe boundaries and immutable study banks.');
