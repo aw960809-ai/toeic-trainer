@@ -253,6 +253,14 @@ function tab(id){
   if(id==='settings')renderSettings();
   if(id!=='vocab')window.speechSynthesis?.cancel();
   window.scrollTo({top:0,behavior:'instant'});
+  // Correct browser scroll anchoring after the shared reading/grammar panel swaps.
+  // Never interfere with an active quiz, its draft, or post-exam scrolling.
+  if((id==='reading'||id==='grammar')&&!quiz&&!readingRun){
+    requestAnimationFrame(()=>{
+      if(currentTab===id&&!quiz&&!readingRun)
+        window.scrollTo({top:0,behavior:'auto'});
+    });
+  }
   if(active)active.lastTick=performance.now();
   renderDraftBanner();syncFocusShell();
 }
