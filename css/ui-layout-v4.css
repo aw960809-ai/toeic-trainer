@@ -123,3 +123,26 @@
 @media(prefers-reduced-motion:reduce){
   .main-nav .nav-btn,.quick,.answer{transition:none!important}
 }
+
+/* V5-PHASE2-WORKFLOW: visible affordance for due words and post-exam review. */
+#tab-home .tt-due-vocab-shortcut{
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  width:100%;min-width:0;min-height:64px;box-sizing:border-box;
+  padding:10px 12px;cursor:pointer;text-align:left;
+  background:var(--paper);color:var(--ink);border:1px solid var(--line);
+  font:inherit;box-shadow:none;
+}
+#tab-home .tt-due-vocab-shortcut>span{font-size:11px;line-height:1.4;color:var(--mute)}
+#tab-home .tt-due-vocab-shortcut>span>span{margin-left:3px;color:var(--sage)}
+#tab-home .tt-due-vocab-shortcut:active{background:var(--sage-soft)}
+#tab-home .tt-due-vocab-shortcut:focus-visible{
+  outline:3px solid var(--focus);outline-offset:2px;
+}
+#tab-practice #practiceFinished .button-row,
+#tab-practice #readingLessonPanel .button-row{flex-wrap:wrap;gap:7px}
+#tab-practice #practiceFinished .button-row .btn,
+#tab-practice #readingLessonPanel .button-row .btn{min-height:44px}
+@media(max-width:390px){
+  #tab-practice #practiceFinished .button-row .btn,
+  #tab-practice #readingLessonPanel .button-row .btn{flex:1 1 135px;min-width:0}
+}

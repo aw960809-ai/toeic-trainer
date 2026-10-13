@@ -270,8 +270,20 @@ function renderHome(){
     statCard('已完成訓練',state.sessions.length+' 次'),
     statCard('累計專注時間',Math.round(totalSeconds()/60)+' 分'),
     statCard('練習正確率',ans?Math.round(100*right/ans)+'%':'—'),
-    statCard('待學／到期單字',countDue()+' 張')
+    `<button type="button" id="homeDueVocab" class="metric tt-due-vocab-shortcut" aria-label="查看待學與到期單字"><b>${countDue()} 張</b><span>待學／到期單字 <span aria-hidden="true">→</span></span></button>`
   ].join('');
+}
+/* V5 phase 2: navigate to filtered word library, never start an exam or write a Session. */
+function openDueVocabLibrary(){
+  if(quiz||readingRun){notify('請先交卷或暫存目前的試卷');return}
+  const filter=byId('vocabFilter');
+  if(!filter)return;
+  filter.value='due';
+  vocabListPage=0;
+  tab('vocab');
+  changeVocabView('library');
+  const panel=byId('vocabLibraryPanel');
+  if(panel&&!panel.hidden)requestAnimationFrame(()=>panel.scrollIntoView({block:'start',behavior:'auto'}));
 }
 function vocabMatching(){
   const filter=byId('vocabFilter').value,needle=byId('vocabSearch').value.trim().toLocaleLowerCase();
@@ -619,10 +631,12 @@ function finishQuiz(timedOut=false){
   const returnAction=source.context==='vocab'
     ?'<div class="post-exam-return"><button class="btn btn-light" id="backToVocabHome" type="button">← 返回單字首頁</button></div>'
     :'';
+  const mistakeShortcut=source.context!=='vocab'&&score.correct<score.total
+    ?'<button id="reviewMistakesAfterPractice" class="btn btn-light" type="button">查看錯題與弱點</button>':'';
   const result=`<div class="panel">${returnAction}<div class="eyebrow">SUBMITTED · ANSWERS UNLOCKED</div><h2 class="result-title">已交卷並完成批改</h2>`+
     `${timedOut?'<p class="muted">75 分鐘已到，未作答題目以錯誤計入正確率。</p>':''}`+
     `<div class="result-summary"><div><b>${score.total}</b><span>試卷總題</span></div><div><b>${event.accuracy}%</b><span>本次正確率</span></div><div><b>${Math.round(seconds/60)} 分</b><span>記錄時間</span></div></div>`+
-    `${summaryEventHtml(event)}<div class="button-row"><button id="continuePractice" class="btn btn-primary">再練一次</button><button id="historyAfterPractice" class="btn btn-light">學習紀錄</button></div>`+
+    `${summaryEventHtml(event)}<div class="button-row"><button id="continuePractice" class="btn btn-primary">${source.context==='vocab'?'再練一組':'調整題目再練'}</button><button id="historyAfterPractice" class="btn btn-light">學習紀錄</button>${mistakeShortcut}</div>`+
     (source.topic&&grammarById[source.topic]?(()=>{const g=grammarById[source.topic];return `<details class="grammar-lesson" open><summary>文法規則與例句 · ${esc(g.title)}</summary><code>${esc(g.formula)}</code><p lang="en">${esc(g.ruleEn)}</p><p>${esc(g.ruleZh)}</p><blockquote lang="en">${esc(g.example)}</blockquote><p>${esc(g.exampleZh)}</p><p>常見錯誤：${esc(g.pitfall)}</p></details>`})():'')+
     reviewSection(reviewItems,score.decisions)+`</div>`;
   const holder=source.context==='vocab'?byId('vocabSession'):byId('practiceFinished');
@@ -670,6 +684,7 @@ function finishQuiz(timedOut=false){
     renderPoolHint();syncFocusShell();
   };
   byId('historyAfterPractice').onclick=()=>tab('history');
+  byId('reviewMistakesAfterPractice')?.addEventListener('click',()=>tab('mistakes'));
   lastCompletedReview={event,items:reviewItems,score};
   renderHome();syncFocusShell();revealActiveExam(source.context==='vocab'?'#vocabSession':'#practiceFinished');notify('交卷結果已儲存，解析已解鎖');
 }
@@ -804,11 +819,14 @@ function finishReadingLesson(){
    `<div class="result-summary"><div><b>${score.total}</b><span>理解題</span></div><div><b>${event.accuracy}%</b><span>正確率</span></div><div><b>${Math.floor(seconds/60)} 分</b><span>專注時間</span></div></div>${summaryEventHtml(event)}`+
    `<h3>逐句翻譯與句型解析</h3><div class="sentence-list">`;
   lesson.sentences.forEach((sentence,i)=>out+=`<details class="sentence-card"><summary class="sentence-en" lang="en">${esc(sentence.en)}</summary><div class="sentence-notes"><p>${esc(sentence.zh)}</p><p>${esc(sentence.note)}</p></div></details>`);
+  const readingMistakeShortcut=score.correct<score.total
+    ?'<button id="reviewMistakesAfterReading" class="btn btn-light" type="button">查看錯題與弱點</button>':'';
   out+='</div>'+reviewSection(qs,score.decisions)+
-  `${LengthPolicy.nextLevel(lesson.tier)&&event.accuracy>=80?'<p class="progression-next">本篇達 80%，可自主選擇下一難度；原篇可重做。</p>':''}<div class="button-row"><button class="btn btn-primary" id="readAgain">再讀一篇</button><button class="btn btn-light" id="historyAfterReading">學習紀錄</button></div></div>`;
+  `${LengthPolicy.nextLevel(lesson.tier)&&event.accuracy>=80?'<p class="progression-next">本篇達 80%，可自主選擇下一難度；原篇可重做。</p>':''}<div class="button-row"><button class="btn btn-primary" id="readAgain">選擇下一篇</button><button class="btn btn-light" id="historyAfterReading">學習紀錄</button>${readingMistakeShortcut}</div></div>`;
   const view=byId('readingLessonPanel');view.hidden=false;view.innerHTML=out;
   byId('readAgain').onclick=()=>{view.hidden=true;view.innerHTML='';readingResultVisible=false;syncFocusShell();revealActiveExam('#readingCoach')};
   byId('historyAfterReading').onclick=()=>tab('history');
+  byId('reviewMistakesAfterReading')?.addEventListener('click',()=>tab('mistakes'));
   lastCompletedReview={event,items:qs,score};renderHome();syncFocusShell();revealActiveExam('#readingLessonPanel');notify('已交卷，閱讀原文與解析已解鎖');
 }
 function renderMistakes(){
@@ -952,6 +970,7 @@ function goQuick(mode){
 function startMistakes(){goQuick('mistakes');startPractice('mistakes')}
 function attach(){
   document.addEventListener('click',e=>{
+    if(e.target.closest?.('#homeDueVocab')){openDueVocabLibrary();return;}
     const btn=e.target.closest?.('[data-review-filter]');
     if(!btn)return;
     const section=btn.closest('.post-review');if(!section)return;
