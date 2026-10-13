@@ -27,7 +27,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const summaryLabel={review:'短時間複習／弱點快速複習',article:'文章整合／文章精讀',practice:'題目＋檢討',mock:'模考／考試適應'};
 const names={5:'Incomplete Sentences',6:'Text Completion',7:'Reading Comprehension'};
 const defaultState=()=>Core.fresh();
-let visualPrefs=Prefs.DEFAULT;try{visualPrefs=Prefs.load(window.localStorage)}catch(_){}
+let visualPrefs=Prefs.DEFAULT;try{visualPrefs=Prefs.resolve(window.localStorage,Prefs.load(window.localStorage))}catch(_){}
 let state=defaultState(),storageBlocked=false,storeReason='',currentTab='home',active=null,quiz=null,vocab=null,readingRun=null,quizTopic=null,toastTimer=null,savedDraft=null,lastCompletedReview=null;
 // Goal Manager backup is transient read-only input: never stored, never written back.
 let goalSnapshot=null,bridgeReport=null,bridgeSelected=new Set(),readingResultVisible=false;
@@ -136,6 +136,12 @@ function resumeExam(){
 }
 function resetFinishedReview(){lastCompletedReview=null;byId('practiceFinished').hidden=true;}
 function syncVisualSettings(){
+  // Goal Manager has priority only when a valid shared visual preference exists.
+  const suite=Prefs.loadSuite(window.localStorage);
+  visualPrefs=Prefs.resolve(window.localStorage,Prefs.load(window.localStorage));
+  const local=byId('toeicLocalAppearanceControls'),hint=byId('toeicSuiteAppearanceHint');
+  if(local)local.hidden=!!suite;
+  if(hint)hint.hidden=!suite;
   Prefs.apply(document.documentElement,visualPrefs);
   for(const [group,field] of [['settingsAppearanceButtons','appearance'],['settingsAccentButtons','accent'],['settingsTextSizeButtons','textSize']]){
     byId(group)?.querySelectorAll('button').forEach(button=>{
@@ -146,6 +152,9 @@ function syncVisualSettings(){
   }
 }
 function updateVisualPreference(field,value){
+  if(Prefs.loadSuite(window.localStorage)){
+    syncVisualSettings();notify('外觀由 Goal Manager 統一設定；此處不會修改設定。');return;
+  }
   try{
     const next=Prefs.save(window.localStorage,{...visualPrefs,[field]:value});
     visualPrefs=next;
@@ -179,6 +188,10 @@ function changeVocabView(view){
   syncVocabView();
   if(view==='library')renderWordLookup();
 }
+// Other tabs/embedded views update the same-origin appearance-only key.
+window.addEventListener('storage',event=>{
+  if(event.key===Prefs.SUITE_KEY)syncVisualSettings();
+});
 function renderSettings(){
   syncVisualSettings();
   renderBridge();

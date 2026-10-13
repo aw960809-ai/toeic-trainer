@@ -75,4 +75,8 @@ assert(skin.includes('.pill.warn{'));
 assert(skin.includes('html[data-accent="slate"]{--tt-light-accent:#596A85;'));
 assert(read('js/auto-sync.js').includes('toeic-trainer:v051-link-settings'));
 
+assert(html.includes('id="toeicLocalAppearanceControls"'));
+assert(html.includes('id="toeicSuiteAppearanceHint"'));
+assert.equal(prefs.SUITE_KEY,'gm-suite:appearance-v1');
+assert(skin.includes('SUITE-SETTINGS-UI-V1'));
 console.log('PASS: V0.5.0 settings hub, theme persistence, analysis routing, safe boundaries and immutable study banks.');

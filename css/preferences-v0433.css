@@ -1,8 +1,8 @@
 /* TOEIC Trainer V0.4.3.3 — settings and calm non-green palette; no data or test engine. */
 html[data-accent="slate"]{--tt-light-accent:#596A85;--tt-light-soft:#E8EDF3;--tt-dark-accent:#A8BED7;--tt-dark-soft:#2A3849;--tt-hero-right:#445a78}
-html[data-accent="indigo"]{--tt-light-accent:#6b5da1;--tt-light-soft:#f0edfa;--tt-dark-accent:#c0a9ef;--tt-dark-soft:#443c5c;--tt-hero-right:#50486f}
-html[data-accent="graphite"]{--tt-light-accent:#4b6373;--tt-light-soft:#eaf0f2;--tt-dark-accent:#b5c8d6;--tt-dark-soft:#3b4752;--tt-hero-right:#46525e}
-html[data-accent="teal"]{--tt-light-accent:#277780;--tt-light-soft:#e8f3f4;--tt-dark-accent:#95cad0;--tt-dark-soft:#294c53;--tt-hero-right:#315f69}
+html[data-accent="indigo"]{--tt-light-accent:#6E567D;--tt-light-soft:#F0EAF4;--tt-dark-accent:#CEB5E2;--tt-dark-soft:#392C43;--tt-hero-right:#50486f}
+html[data-accent="graphite"]{--tt-light-accent:#3B495A;--tt-light-soft:#E7EBEF;--tt-dark-accent:#C4D0DF;--tt-dark-soft:#2C3643;--tt-hero-right:#46525e}
+html[data-accent="teal"]{--tt-light-accent:#3D6F62;--tt-light-soft:#E4EFE9;--tt-dark-accent:#99D0BA;--tt-dark-soft:#253C36;--tt-hero-right:#315f69}
 html[data-appearance="system"],html[data-appearance="light"]{
   color-scheme:light;
   --canvas:#f3f5f8;--paper:#fff;--paper-2:#f8f9fc;
@@ -156,3 +156,13 @@ html[data-appearance="dark"]{
   font-size:12px;font-weight:600;line-height:1.35;padding:4px 9px}
 .pill.warn{background:var(--tt-tag-warm-bg);color:var(--tt-tag-warm-text);
   border-color:var(--tt-tag-warm-border)}
+
+/* SUITE-SETTINGS-UI-V1: keep independent backups, hide duplicate visual options only. */
+#toeicLocalAppearanceControls[hidden],#toeicSuiteAppearanceHint[hidden]{display:none!important}
+#toeicSuiteAppearanceHint{padding:11px 12px;background:var(--paper-2);border:1px solid var(--line);
+  border-radius:11px;color:var(--mute);font-size:13px;line-height:1.55}
+#toeicSuiteAppearanceHint p{margin:0 0 7px;line-height:1.5}
+#toeicSuiteAppearanceHint a{color:var(--sage);font-weight:650;text-decoration:underline}
+#tab-settings .settings-heading{margin:6px 0 11px}
+#tab-settings .settings-heading h1{font-size:20px}
+#tab-settings .settings-heading p{font-size:13px;line-height:1.5}
