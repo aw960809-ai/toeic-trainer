@@ -1,5 +1,5 @@
 /* TOEIC Trainer V0.4.3.3 — settings and calm non-green palette; no data or test engine. */
-html[data-accent="slate"]{--tt-light-accent:#526d98;--tt-light-soft:#e8eef8;--tt-dark-accent:#a6b9e3;--tt-dark-soft:#30415c;--tt-hero-right:#445a78}
+html[data-accent="slate"]{--tt-light-accent:#596A85;--tt-light-soft:#E8EDF3;--tt-dark-accent:#A8BED7;--tt-dark-soft:#2A3849;--tt-hero-right:#445a78}
 html[data-accent="indigo"]{--tt-light-accent:#6b5da1;--tt-light-soft:#f0edfa;--tt-dark-accent:#c0a9ef;--tt-dark-soft:#443c5c;--tt-hero-right:#50486f}
 html[data-accent="graphite"]{--tt-light-accent:#4b6373;--tt-light-soft:#eaf0f2;--tt-dark-accent:#b5c8d6;--tt-dark-soft:#3b4752;--tt-hero-right:#46525e}
 html[data-accent="teal"]{--tt-light-accent:#277780;--tt-light-soft:#e8f3f4;--tt-dark-accent:#95cad0;--tt-dark-soft:#294c53;--tt-hero-right:#315f69}
@@ -35,7 +35,7 @@ html[data-appearance="dark"]{
 .intro-banner .eyebrow,.intro-banner small{color:#c9d6e8!important}
 .intro-banner .btn-primary{background:#e4eafa!important;border-color:#e4eafa!important;color:#1d304c!important}
 .intro-banner .btn-light{border-color:#8da2ba!important;color:#fff!important;background:transparent!important}
-.pill:not(.warn){color:var(--tt-label)!important}
+.pill:not(.warn){color:var(--tt-tag-neutral-text)!important}
 .answer.picked,.exam-index-grid button.answered,.review-toolbar button.active,.tt-tabs button.active,.tt-tabs button[aria-pressed="true"]{background:var(--sage-soft)!important;border-color:var(--sage)!important;color:var(--ink)!important}
 .tt-tabs button.active,.tt-tabs button[aria-pressed="true"]{box-shadow:inset 0 0 0 1px var(--sage)!important}
 .answer.correct{border-color:#649e89!important;background:#eaf4ee!important;color:#233d34!important}
@@ -120,7 +120,7 @@ html[data-text-size="large"] .tt-list-row,html[data-text-size="large"] .nav-btn{
 #tab-vocab #vocabLibraryPanel[hidden],#tab-vocab #vocabViewTabs[hidden]{display:none!important}
 #tab-vocab .vocab-library-panel{padding:17px;max-width:none}
 #tab-vocab .vocab-library-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:5px}
-#tab-vocab .vocab-library-header h2{font-size:20px;margin:3px 0 0}
+#tab-vocab .vocab-library-header h2{font-size:17px;margin:3px 0 0}
 #tab-vocab #wordDictionaryCount{font-size:12px;color:var(--mute);white-space:nowrap}
 #tab-vocab .vocab-library-lead{font-size:13px;color:var(--mute);margin:9px 0 13px;line-height:1.65}
 #tab-vocab .word-dictionary{border-top:0;padding-top:0;margin:0;max-width:none}
@@ -137,3 +137,22 @@ html[data-text-size="large"] .tt-list-row,html[data-text-size="large"] .nav-btn{
 #tab-vocab .post-exam-return{display:flex;justify-content:flex-start;margin:0 0 14px}
 #tab-vocab .post-exam-return .btn{min-height:44px;padding:9px 14px;max-width:100%;white-space:normal}
 #tab-vocab #vocabSession .button-row .btn{min-width:0}
+
+/* Dual-app design V1 — pills only for true learning/status metadata. */
+:root{
+  --tt-tag-neutral-bg:#EAF1F5;--tt-tag-neutral-text:#657C8B;--tt-tag-neutral-border:#D3E0E7;
+  --tt-tag-warm-bg:#F3EEE2;--tt-tag-warm-text:#826C43;--tt-tag-warm-border:#E2D4B8;
+}
+html[data-appearance="dark"]{
+  --tt-tag-neutral-bg:#293A4A;--tt-tag-neutral-text:#C2D5E2;--tt-tag-neutral-border:#405469;
+  --tt-tag-warm-bg:#41382A;--tt-tag-warm-text:#E1C99B;--tt-tag-warm-border:#63513B;
+}
+@media(prefers-color-scheme:dark){html[data-appearance="system"]{
+  --tt-tag-neutral-bg:#293A4A;--tt-tag-neutral-text:#C2D5E2;--tt-tag-neutral-border:#405469;
+  --tt-tag-warm-bg:#41382A;--tt-tag-warm-text:#E1C99B;--tt-tag-warm-border:#63513B;
+}}
+.pill{background:var(--tt-tag-neutral-bg);color:var(--tt-tag-neutral-text);
+  border:1px solid var(--tt-tag-neutral-border);border-radius:999px;
+  font-size:12px;font-weight:600;line-height:1.35;padding:4px 9px}
+.pill.warn{background:var(--tt-tag-warm-bg);color:var(--tt-tag-warm-text);
+  border-color:var(--tt-tag-warm-border)}

@@ -63,4 +63,16 @@ const frozen={
 'js/bridge.js':'5c94fc658954466480b25deb6dff6c6537f813d2d17cafe6b956b1b19c5d9fbb'
 };
 for(const [file,hash] of Object.entries(frozen))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex'),hash,file);
+
+/* Compact cross-app visual contract: only role-specific chips, never exam answers. */
+const typeSkin=read('css/layout-v043.css');
+assert(typeSkin.includes('font-size:15px;line-height:1.55'));
+assert(typeSkin.includes('.section-head h1{font-size:clamp(20px,3vw,23px)}'));
+assert(typeSkin.includes('.intro-banner h1{font-size:clamp(22px,4vw,26px)'));
+assert(typeSkin.includes('font-size:16px;line-height:1.72'));
+assert(skin.includes('--tt-tag-neutral-bg:') && skin.includes('--tt-tag-warm-bg:'));
+assert(skin.includes('.pill.warn{'));
+assert(skin.includes('html[data-accent="slate"]{--tt-light-accent:#596A85;'));
+assert(read('js/auto-sync.js').includes('toeic-trainer:v051-link-settings'));
+
 console.log('PASS: V0.5.0 settings hub, theme persistence, analysis routing, safe boundaries and immutable study banks.');
