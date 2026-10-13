@@ -1,0 +1,125 @@
+/* UI-LAYOUT-V4: TOEIC Trainer whole-suite responsive system. UI only.
+ * Home, reading, vocabulary, grammar, analysis, history and settings.
+ * Do not change exam grading, active-exam visibility or English content source.
+ */
+:root{
+  --ux-gap:9px;
+  --ux-inset:clamp(10px,2.5vw,18px);
+  --ux-radius:12px;
+  --ux-heading:20px;
+  --ux-section:16px;
+  --ux-meta:12px;
+}
+.site-shell{max-width:1120px;min-width:0}
+.site-shell :is(.tab-page,.panel,.two-col,.metrics,.quick-grid,.tt-reading-browser,
+                .tt-grammar-browser,.tt-vocab-controls,.tt-list-row,.bridge-row){min-width:0}
+/* Six destinations stay within available width, 44px minimum tap area. */
+.main-nav{gap:5px;min-width:0}
+.main-nav .nav-btn{
+  min-width:0;min-height:44px;box-shadow:none;font-size:13px;font-weight:650;
+  border-radius:10px;
+}
+.main-nav .nav-btn:focus-visible,
+.site-shell :is(.btn,.tt-tabs button,.tt-more,.answer):focus-visible{
+  outline:3px solid var(--focus);outline-offset:2px;
+}
+/* Semantic typography: reading passages deliberately remain larger than UI. */
+.tab-page>.section-head h1,.settings-heading h1{font-size:var(--ux-heading)!important;font-weight:700}
+.tab-page>.section-head p{font-size:13px;line-height:1.5}
+.tab-page .section-title h2{font-size:var(--ux-section);font-weight:650;line-height:1.4}
+.site-shell .panel{min-width:0;box-shadow:none;border-radius:var(--ux-radius)}
+.site-shell .section-title{margin-bottom:10px;gap:8px}
+.site-shell .button-row{gap:8px}
+.site-shell .btn{min-height:44px;border-radius:10px;font-size:13px;font-weight:650}
+.site-shell :is(.quick,.metric,.vocab-library-panel,.reading-study,.grammar-lesson){
+  border-radius:var(--ux-radius);box-shadow:none;
+}
+/* Home: one visual rhythm for hero, primary actions, and learning metrics. */
+#tab-home .home-compact-hero{gap:7px}
+#tab-home .home-compact-hero h1{font-size:clamp(21px,3.2vw,25px)!important}
+#tab-home .home-compact-hero .hero-actions{gap:7px}
+#tab-home :is(.metrics,.quick-grid,.two-col){gap:var(--ux-gap)}
+#tab-home .metric{min-height:64px;padding:10px 12px}
+#tab-home .metric b{font-size:21px}
+#tab-home .quick{min-height:78px;padding:12px}
+#tab-home .quick strong{font-size:14px}
+#tab-home :is(.training-directory,.quick-grid){min-width:0}
+/* Vocabulary: clear switching, cards and lookup rows, still 44px targets. */
+#tab-vocab :is(.vocab-view-switch,.tt-vocab-controls,.tt-vocab-categories){gap:7px}
+#tab-vocab .vocab-view-switch button{min-height:44px;font-size:13px}
+#tab-vocab :is(.vocab-compact-setup,.vocab-library-panel){min-width:0}
+#tab-vocab .word-dictionary .word-row{gap:8px;min-width:0}
+#tab-vocab .word-dictionary .word-row b{font-size:14px}
+#tab-vocab :is(.tt-list-row,.word-row){overflow-wrap:anywhere}
+/* Reading + grammar: do not shrink long text below 16px. */
+#tab-practice :is(.tt-reading-browser,.tt-grammar-browser,.tt-tabs,.tt-choice-tabs){min-width:0}
+#tab-practice .tt-tabs button{min-width:0;min-height:44px;white-space:normal;line-height:1.3}
+#tab-practice :is(.reading-document,.passage,.transcript){
+  min-width:0;max-width:100%;overflow-wrap:anywhere;
+}
+#tab-practice .reading-paragraph{font-size:17px;line-height:1.78}
+#tab-practice :is(.passage,.transcript){font-size:16px;line-height:1.74}
+#tab-practice :is(.q-stem,.reading-quiz .q-stem){line-height:1.6}
+#tab-practice .answer{
+  min-height:52px;border-radius:10px;font-size:15px;line-height:1.55;
+  overflow-wrap:anywhere;
+}
+#tab-practice :is(.exam-panel,.reading-study,.grammar-lesson){min-width:0}
+#tab-practice .exam-index-grid button{min-height:44px}
+#tab-practice .exam-nav{min-width:0;gap:7px}
+/* Analysis and history: dense but readable entries, don't suppress records. */
+#tab-mistakes :is(.panel,.review-row,.list-row,.post-review,.review-toolbar),
+#tab-history :is(.panel,.history-row,.list-row,.record-row){min-width:0}
+#tab-mistakes :is(.review-detail,.list-row),
+#tab-history :is(.history-row,.list-row){overflow-wrap:anywhere}
+#tab-mistakes .review-detail>summary{min-height:44px;font-size:13px}
+#tab-history :is(.metric,.list-row){box-shadow:none}
+/* Settings: keep consent/data/quality separate; quality fold remains collapsible. */
+#tab-settings .settings-heading{margin:5px 0 9px}
+#tab-settings .settings-heading h1{font-size:20px!important}
+#tab-settings .settings-fold>summary{min-height:44px}
+#tab-settings :is(.settings-section,.settings-section-group,.tt-information-fold){min-width:0}
+#tab-settings #settingsInformation.tt-information-fold{box-shadow:none}
+#tab-settings .tt-suite-managed-strip{gap:8px}
+#tab-settings .settings-choice-row button{min-height:44px}
+@media(max-width:700px){
+  :root{--ux-gap:7px;--ux-inset:max(9px,env(safe-area-inset-left),env(safe-area-inset-right))}
+  /* All pages share one gutter; no repeated eight-pixel nested offsets. */
+  .site-shell{max-width:none;padding:0 var(--ux-inset)!important}
+  .tab-page{padding:7px 0 24px!important}
+  .main-nav{padding:7px 0 8px!important;gap:4px;margin-bottom:0}
+  .main-nav .nav-btn{font-size:12px;padding:8px 2px;min-height:44px}
+  #tab-home .home-compact-hero{margin:0 0 9px!important;padding:15px 13px!important;border-radius:11px}
+  #tab-home .home-compact-hero h1{font-size:22px!important}
+  #tab-home .home-compact-hero p{font-size:12px!important}
+  #tab-home .home-compact-hero .hero-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  #tab-home .home-compact-hero .hero-actions .btn{min-width:0;font-size:12px;padding:7px 3px}
+  #tab-home :is(.metrics,.quick-grid){gap:7px!important}
+  #tab-home .metric{padding:9px 10px!important}
+  #tab-home .metric b{font-size:20px}
+  .site-shell .panel{padding:12px!important;margin-bottom:8px!important;border-radius:11px!important}
+  #tab-vocab :is(.vocab-library-panel,.vocab-compact-setup){padding:12px!important}
+  #tab-vocab .word-row{min-width:0}
+  #tab-practice .reading-document{padding:14px 12px!important;margin:9px 0 15px}
+  #tab-practice .reading-paragraph{font-size:17px;line-height:1.78}
+  #tab-practice .passage{padding:14px 12px}
+  #tab-practice .answer{padding:11px 12px;min-height:52px}
+  #tab-practice .answer.picked{padding:10px 11px}
+  #tab-practice :is(.tt-reading-browser,.tt-grammar-browser){gap:8px}
+  #tab-practice .exam-panel{padding:12px!important}
+  #tab-practice .exam-index-grid{gap:6px;padding:10px}
+  #tab-mistakes :is(.review-content,.post-review),
+  #tab-history :is(.panel,.list-row){min-width:0}
+  #tab-settings .settings-heading p{margin:6px 0 0}
+  #tab-settings .settings-fold>summary{padding:10px 11px}
+  #tab-settings #settingsInformation.tt-information-fold>summary{min-height:44px}
+}
+@media(max-width:370px){
+  .main-nav{gap:2px}
+  .main-nav .nav-btn{font-size:11px;padding:8px 0}
+  #tab-practice .tt-reading-tabs button{white-space:normal;font-size:11px}
+  #tab-home .home-compact-hero .hero-actions .btn{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  .main-nav .nav-btn,.quick,.answer{transition:none!important}
+}
