@@ -192,7 +192,7 @@
     </section>
     <section id="tab-settings" class="tab-page" hidden>
       <header class="section-head settings-heading"><h1>訓練設定</h1>
-        <p>集中管理連動、備份與題庫資訊；可共用 Goal Manager 外觀。</p>
+        <p>連動、備份、題庫與進階工具集中在此；外觀優先跟隨 Goal Manager。</p>
       </header>
       <div id="toeicSuiteAppearanceStrip" class="tt-suite-managed-strip" hidden>
         <span>外觀由 Goal Manager 統一管理</span><a href="/my-goal-manager/">前往主設定 ↗</a>
@@ -209,10 +209,10 @@
         </div>
         <div class="settings-setting-label">主題色</div>
         <div class="settings-palette-grid" id="settingsAccentButtons" role="group" aria-label="介面主題色">
-          <button type="button" data-accent-value="slate"><i class="swatch slate" aria-hidden="true"></i>霧藍灰</button>
-          <button type="button" data-accent-value="indigo"><i class="swatch indigo" aria-hidden="true"></i>靛紫</button>
-          <button type="button" data-accent-value="graphite"><i class="swatch graphite" aria-hidden="true"></i>石墨</button>
-          <button type="button" data-accent-value="teal"><i class="swatch teal" aria-hidden="true"></i>青綠</button>
+          <button type="button" data-accent-value="slate"><i class="swatch slate" aria-hidden="true"></i>霧藍</button>
+          <button type="button" data-accent-value="teal"><i class="swatch teal" aria-hidden="true"></i>鼠尾草綠</button>
+          <button type="button" data-accent-value="indigo"><i class="swatch indigo" aria-hidden="true"></i>灰紫</button>
+          <button type="button" data-accent-value="graphite"><i class="swatch graphite" aria-hidden="true"></i>石墨灰</button>
         </div>
         <div class="settings-setting-label">文字大小</div>
         <div class="settings-choice-row" id="settingsTextSizeButtons" role="group" aria-label="文字大小">
@@ -223,7 +223,7 @@
         </div>
       </div>
       <div class="settings-section-group">
-        <details class="panel settings-fold" id="settingsDataPanel"><summary><span>資料與備份</span><small>匯出、還原、事件核對</small></summary><div class="settings-fold-body"><div class="section-title"><div><small>DATA OWNERSHIP</small><h2>備份與資料交換</h2></div></div>
+        <details class="panel settings-fold" id="settingsDataPanel"><summary><span>02 · 資料與備份</span><small>獨立匯出、還原</small></summary><div class="settings-fold-body"><div class="section-title"><div><small>DATA OWNERSHIP</small><h2>備份與資料交換</h2></div></div>
         <p class="muted">匯出的是這套新程式的紀錄，絕不包含 Goal Manager 原始資料。可在這裡還原訓練端自己的備份；不支援匯入其他來源資料。</p>
         <div class="button-row"><button id="exportBackup" class="btn btn-primary">下載完整訓練備份</button><button id="exportEvents" class="btn btn-light">進階事件核對（選用）</button><button id="importBackupBtn" class="btn btn-light">匯入此程式備份</button></div>
         <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
@@ -231,7 +231,7 @@
       </div></details>
       </div>
       <div class="settings-section-group" id="toeicAutoLinkPanel">
-        <details class="panel settings-fold" id="autoSyncDetails"><summary><span>Goal Manager 自動連動</span><small>同網站 · 開啟時安全入帳</small></summary>
+        <details class="panel settings-fold" id="autoSyncDetails"><summary><span>01 · Goal Manager 自動連動</span><small id="autoSyncSummary" aria-live="polite">正在檢查連動狀態</small></summary>
           <div class="settings-fold-body"><h2>學習成果自動連動</h2>
             <p class="muted">第一次請從原本 localhost 的 Trainer 下載完整訓練備份，再到 Goal Manager 同網域的 Trainer 還原一次。兩個網址的儲存空間不同；已還原至同網站 Trainer 的歷史 Session，會由 Goal Manager 自動核對有效成果。</p>
             <p id="autoSyncStatus" class="fineprint" role="status">正在檢查連動狀態</p>
@@ -239,7 +239,8 @@
             <p class="fineprint">本頁啟用一次後，Goal Manager 開啟或切回時，會自動核對已存在及新增、達 60 秒且符合 Level 4 目標的正式交卷事件。同日人工補登或時間重疊的事件安全暫緩；正確率仍只保留在訓練端。</p>
           </div></details>
       </div>
-      <div class="settings-section-group" id="settingsGoalTools">
+      <details class="settings-section-group tt-advanced-fold" id="settingsGoalTools">
+        <summary><span>04 · 系統資訊與進階工具</span><small>疑難核對、使用說明</small></summary>
         <details class="panel integration-disclosure" id="bridgeDisclosure"><summary><span><b>進階：歷史事件核對（非必要）</b><small>僅疑難排查時使用，平時不需操作</small></span><span class="disclosure-chevron" aria-hidden="true">⌄</span></summary>
       <div id="bridgePanel" class="disclosure-content">
         <div class="section-title"><div><small>V0.3 · READ-ONLY LINK PREVIEW</small><h2>學習成果安全連結預覽</h2></div></div>
@@ -262,9 +263,9 @@
         <details class="panel architecture-disclosure"><summary><span><small>LEARNING RECORD</small><b>學習紀錄與目標系統</b></span><span class="disclosure-chevron" aria-hidden="true">⌄</span></summary>
           <div class="architecture"><div><b>訓練端</b><p>獨立保存答題、單字記憶與有效專注分鐘。</p></div><div class="architecture-arrow">↓ 同網站可選自動連動／手動核對備援</div><div><b>目標系統</b><p>新 Session 在同網站啟用後，由 Goal Manager 驗證並計入 Level 4 目標；Trainer 不直接修改目標資料。</p></div></div>
         </details>
-      </div>
+      </details>
       <details class="settings-section-group tt-information-fold" id="settingsInformation">
-        <summary><span>題庫與系統資訊</span><small>品質檢查、來源及複習規則</small></summary>
+        <summary><span>03 · 題庫與學習管理</span><small>來源、品質與複習規則</small></summary>
         <div class="panel settings-section"><div class="section-title"><div><small>ABOUT & QUALITY</small><h2>品質與來源說明</h2></div></div>
           <p class="muted">TOEIC Trainer V0.5.2 · 原創 Part 5–7 題庫，非 ETS 官方產品。</p>
           <div class="settings-health" id="settingsStorageHealth" role="status">本機學習紀錄與外觀設定分開保存</div>
