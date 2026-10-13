@@ -6,7 +6,7 @@
   if(root)root.ToeicTrainerPreferences=api;
   if(root?.document?.documentElement){
     let store=null;try{store=root.localStorage}catch(_){}
-    api.apply(root.document.documentElement,api.load(store));
+    api.apply(root.document.documentElement,api.resolve(store,api.load(store)));
   }
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
@@ -44,5 +44,28 @@
     if(root&&root.dataset){root.dataset.appearance=next.appearance;root.dataset.accent=next.accent;root.dataset.textSize=next.textSize}
     return next;
   }
-  return Object.freeze({KEY,DEFAULT,ALLOWED,normalize,load,save,apply});
+  // Same-origin Goal Manager visual preference, limited to known enum values.
+  const SUITE_KEY='gm-suite:appearance-v1';
+  const SUITE_ACCENTS=Object.freeze({slate:'slate',sage:'teal',plum:'indigo',charcoal:'graphite'});
+  function loadSuite(storage){
+    try{
+      const raw=storage?.getItem?.(SUITE_KEY);
+      if(!raw||raw.length>4096)return null;
+      const obj=JSON.parse(raw);
+      if(!obj||Array.isArray(obj)||obj.version!==1||
+         !ALLOWED.appearance.includes(obj.appearance)||
+         !Object.hasOwn(SUITE_ACCENTS,obj.accent)||
+         !ALLOWED.textSize.includes(obj.textSize)||
+         !['comfortable','standard','compact'].includes(obj.density))return null;
+      return {version:1,appearance:obj.appearance,accent:obj.accent,
+        textSize:obj.textSize,density:obj.density};
+    }catch(_){return null}
+  }
+  function resolve(storage,fallback){
+    const own=normalize(fallback);
+    const suite=loadSuite(storage);
+    return suite?{...own,appearance:suite.appearance,
+      accent:SUITE_ACCENTS[suite.accent],textSize:suite.textSize}:own;
+  }
+  return Object.freeze({KEY,SUITE_KEY,DEFAULT,ALLOWED,normalize,load,save,apply,loadSuite,resolve});
 });

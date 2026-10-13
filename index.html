@@ -190,11 +190,13 @@
 
     </section>
     <section id="tab-settings" class="tab-page" hidden>
-      <header class="section-head settings-heading"><div class="eyebrow">PERSONAL SETTINGS</div><h1>設定</h1>
-        <p>訓練與學習分析在主頁；外觀、資料備份、Goal Manager 核對與系統資訊集中在這裡；單字查詢請至「單字」頁。</p>
+      <header class="section-head settings-heading"><h1>訓練設定</h1>
+        <p>資料備份、成果連動與題庫資訊。外觀由目標系統統一設定。</p>
       </header>
       <div class="panel settings-section" id="settingsAppearancePanel">
         <div class="section-title"><div><small>APPEARANCE</small><h2>外觀與顏色</h2></div></div>
+        <div id="toeicSuiteAppearanceHint" hidden><p>外觀目前由 Goal Manager 統一管理。顯示模式、主色與字體會自動連動；學習紀錄不會被共用或覆蓋。</p><a href="/my-goal-manager/">返回目標系統調整外觀 →</a></div>
+        <div id="toeicLocalAppearanceControls">
         <div class="settings-setting-label">顯示模式</div>
         <div class="settings-choice-row" id="settingsAppearanceButtons" role="group" aria-label="顯示模式">
           <button type="button" data-appearance-value="system">跟隨系統</button>
@@ -214,6 +216,7 @@
           <button type="button" data-text-size-value="large">大字</button>
         </div>
         <p class="fineprint">只儲存外觀偏好；不更動測驗紀錄、題庫或 Goal Manager。</p>
+        </div>
       </div>
       <div class="settings-section-group">
         <details class="panel settings-fold" id="settingsDataPanel"><summary><span>資料與備份</span><small>匯出、還原、事件核對</small></summary><div class="settings-fold-body"><div class="section-title"><div><small>DATA OWNERSHIP</small><h2>備份與資料交換</h2></div></div>

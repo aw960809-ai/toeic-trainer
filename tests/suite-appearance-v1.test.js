@@ -1,0 +1,27 @@
+/* Shared Goal Manager appearance must not modify TOEIC learning storage. */
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const read=name=>fs.readFileSync(path.join(root,name),'utf8');
+const Prefs=require('../js/preferences.js');
+const storeMap=new Map();
+const store={getItem:k=>storeMap.get(k)||null,setItem:(k,v)=>storeMap.set(k,v)};
+assert.equal(Prefs.SUITE_KEY,'gm-suite:appearance-v1');
+assert.equal(Prefs.loadSuite(store),null);
+const standalone=Prefs.save(store,{appearance:'light',accent:'slate',textSize:'normal'});
+assert.deepEqual(Prefs.resolve(store,standalone),standalone);
+store.setItem(Prefs.SUITE_KEY,JSON.stringify({version:1,appearance:'dark',accent:'charcoal',textSize:'large',density:'compact'}));
+const effective=Prefs.resolve(store,Prefs.load(store));
+assert.deepEqual(effective,{appearance:'dark',accent:'graphite',textSize:'large'});
+assert.equal(Prefs.load(store).accent,'slate','standalone preference remains untouched');
+store.setItem(Prefs.SUITE_KEY,JSON.stringify({version:1,appearance:'dark',accent:'javascript:bad',textSize:'large',density:'compact'}));
+assert.equal(Prefs.loadSuite(store),null,'reject unapproved accent');
+store.setItem(Prefs.SUITE_KEY,'{broken');
+assert.equal(Prefs.loadSuite(store),null,'corrupted shared preference must fall back safely');
+assert(read('index.html').includes('id="toeicSuiteAppearanceHint"'));
+assert(read('index.html').includes('id="toeicLocalAppearanceControls"'));
+assert(read('js/app.js').includes("event.key===Prefs.SUITE_KEY"));
+assert(!read('js/preferences.js').includes('lawLangGoalSystemV92'));
+assert(!read('js/preferences.js').includes('localStorage.clear('));
+console.log('PASS: shared visual mapping, fallback, corruption safety, isolated TOEIC study state');
