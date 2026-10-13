@@ -65,10 +65,23 @@
   function attach({window,document}){
     const status=document.getElementById('autoSyncStatus'),toggle=document.getElementById('autoSyncToggle'),jump=document.getElementById('autoSyncOpenGoal');
     if(!status||!toggle)return;
+    const summary=document.getElementById('autoSyncSummary');
     const paint=()=>{
+      const consent=read(window.localStorage);
       status.textContent=statusText(window);
-      toggle.textContent=read(window.localStorage)?.enabled?'暫停自動連動':'啟用新練習自動連動';
+      toggle.textContent=consent?.enabled?'暫停自動連動':'啟用新練習自動連動';
       toggle.disabled=!hosted(window.location);
+      if(summary){
+        // Display only verified local receipt metadata; never modify consent or training history.
+        let receipt=null;
+        try{const raw=window.localStorage.getItem(STATUS_KEY);if(raw&&raw.length<=4096)receipt=JSON.parse(raw)}catch(_){}
+        const stamp=Date.parse(receipt?.lastCheckedAt||'');
+        const consentStamp=Date.parse(consent?.enabledAt||'');
+        const recent=Number.isFinite(stamp)&&(!Number.isFinite(consentStamp)||stamp>=consentStamp)
+          ?new Date(stamp).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'';
+        summary.textContent=!hosted(window.location)?'僅限正式網站':!consent?.enabled?'尚未啟用':receipt?.blocked
+          ?'已啟用 · 需注意':recent?'已啟用 · '+recent+' 核對':'已啟用 · 等待核對';
+      }
       if(jump)jump.href=new URL('/my-goal-manager/',window.location.href).href;
     };
     toggle.addEventListener('click',()=>{

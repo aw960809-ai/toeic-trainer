@@ -1,8 +1,8 @@
 /* TOEIC Trainer V0.4.3.3 — settings and calm non-green palette; no data or test engine. */
-html[data-accent="slate"]{--tt-light-accent:#596A85;--tt-light-soft:#E8EDF3;--tt-dark-accent:#A8BED7;--tt-dark-soft:#2A3849;--tt-hero-right:#445a78}
-html[data-accent="indigo"]{--tt-light-accent:#6E567D;--tt-light-soft:#F0EAF4;--tt-dark-accent:#CEB5E2;--tt-dark-soft:#392C43;--tt-hero-right:#50486f}
-html[data-accent="graphite"]{--tt-light-accent:#3B495A;--tt-light-soft:#E7EBEF;--tt-dark-accent:#C4D0DF;--tt-dark-soft:#2C3643;--tt-hero-right:#46525e}
-html[data-accent="teal"]{--tt-light-accent:#3D6F62;--tt-light-soft:#E4EFE9;--tt-dark-accent:#99D0BA;--tt-dark-soft:#253C36;--tt-hero-right:#315f69}
+html[data-accent="slate"]{--tt-light-accent:#596A85;--tt-light-soft:#E8EDF3;--tt-dark-accent:#A8BED7;--tt-dark-soft:#2A3849;--tt-hero-right:#35475E;--tt-header-bg:#35475E}
+html[data-accent="indigo"]{--tt-light-accent:#6E567D;--tt-light-soft:#F0EAF4;--tt-dark-accent:#CEB5E2;--tt-dark-soft:#392C43;--tt-hero-right:#503D5F;--tt-header-bg:#503D5F}
+html[data-accent="graphite"]{--tt-light-accent:#3B495A;--tt-light-soft:#E7EBEF;--tt-dark-accent:#C4D0DF;--tt-dark-soft:#2C3643;--tt-hero-right:#303D4C;--tt-header-bg:#303D4C}
+html[data-accent="teal"]{--tt-light-accent:#3D6F62;--tt-light-soft:#E4EFE9;--tt-dark-accent:#99D0BA;--tt-dark-soft:#253C36;--tt-hero-right:#315D52;--tt-header-bg:#315D52}
 html[data-appearance="system"],html[data-appearance="light"]{
   color-scheme:light;
   --canvas:#f3f5f8;--paper:#fff;--paper-2:#f8f9fc;
@@ -42,8 +42,7 @@ html[data-appearance="dark"]{
 .answer.wrong{border-color:#c9858a!important;background:#f9ebee!important;color:#4f2732!important}
 .feedback{border-color:var(--line)!important;background:var(--sage-soft)!important}
 .feedback.bad{background:var(--bad-soft)!important}
-html[data-appearance="dark"] .masthead,html[data-appearance="system"] .masthead{background:#25354e;color:#f8fbff}
-html[data-appearance="light"] .masthead{background:#25354e;color:#f8fbff}
+.masthead{background:var(--tt-header-bg,#35475E);color:#f8fbff}
 html[data-appearance="dark"] .answer.correct{background:#2d473e!important;color:#e1f7ed!important}
 html[data-appearance="dark"] .answer.wrong{background:#583741!important;color:#f9e5e8!important}
 html[data-appearance="dark"] .answer:not(.correct):not(.wrong),html[data-appearance="dark"] .grade-grid button{background:var(--paper);color:var(--ink)}
@@ -82,8 +81,8 @@ html[data-appearance="dark"] .answer .letter{background:#394b62;color:#f0f4fa}
 #tab-settings #settingsTextSizeButtons{grid-template-columns:repeat(2,minmax(0,1fr))}
 #tab-settings .settings-palette-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 #tab-settings .swatch{display:inline-block;width:16px;height:16px;border-radius:50%;flex:0 0 auto;border:1px solid #64758955}
-#tab-settings .swatch.slate{background:#526d98}#tab-settings .swatch.indigo{background:#6b5da1}
-#tab-settings .swatch.graphite{background:#4b6373}#tab-settings .swatch.teal{background:#277780}
+#tab-settings .swatch.slate{background:#596A85}#tab-settings .swatch.indigo{background:#6E567D}
+#tab-settings .swatch.graphite{background:#3B495A}#tab-settings .swatch.teal{background:#3D6F62}
 #tab-settings .settings-health{border:1px solid var(--line);background:var(--paper-2);border-radius:11px;padding:11px 13px;color:var(--mute);font-size:12px;line-height:1.6}
 #tab-settings #settingsDataPanel .button-row{display:flex;flex-wrap:wrap}
 #tab-settings #settingsDataPanel .button-row .btn{flex:1 1 180px;min-width:0}
@@ -180,7 +179,7 @@ html[data-appearance="dark"]{
 .tt-suite-managed-strip a{font-size:12px;color:var(--sage);font-weight:650}
 #tab-settings .settings-heading{margin:4px 0 5px}
 #tab-settings .settings-heading h1{font-size:20px}
-#tab-settings .settings-fold>summary{min-height:46px;padding:10px 12px;font-size:13px;font-weight:650}
+#tab-settings .settings-fold>summary{min-height:52px;padding:10px 12px;font-size:14px;font-weight:700;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #tab-settings .settings-fold .settings-fold-body{padding:8px 12px 12px}
 #tab-settings #settingsInformation .settings-section{padding:12px}
 #tab-settings #settingsGoalTools .integration-disclosure>summary{font-size:13px}
@@ -190,8 +189,9 @@ html[data-appearance="dark"]{
   border-radius:12px;background:var(--paper);box-shadow:none;overflow:hidden}
 #tab-settings #settingsInformation.tt-information-fold>summary{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
-  min-height:46px;padding:10px 12px;list-style:none;cursor:pointer;
-  color:var(--ink);font-size:13px;font-weight:650;line-height:1.5}
+  min-height:52px;padding:10px 12px;list-style:none;cursor:pointer;
+  color:var(--ink);font-size:14px;font-weight:700;line-height:1.5;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #tab-settings #settingsInformation.tt-information-fold>summary::-webkit-details-marker{display:none}
 #tab-settings #settingsInformation.tt-information-fold>summary small{
   font-size:11px;color:var(--mute);font-weight:450;text-align:right;line-height:1.4}
@@ -200,3 +200,27 @@ html[data-appearance="dark"]{
   border-radius:0;box-shadow:none;background:var(--paper)}
 #tab-settings #settingsInformation.tt-information-fold>summary:focus-visible{
   outline:3px solid var(--focus);outline-offset:-3px}
+
+/* SUITE-SETTINGS-V6: four calm, touch-safe disclosures; keep original tools. */
+#tab-settings #settingsGoalTools.tt-advanced-fold{
+  padding:0;margin:0 0 9px;border:1px solid var(--line);
+  border-radius:12px;background:var(--paper);box-shadow:none;overflow:hidden}
+#tab-settings #settingsGoalTools.tt-advanced-fold>summary{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  min-height:52px;padding:10px 12px;list-style:none;cursor:pointer;
+  color:var(--ink);font-size:14px;font-weight:700;line-height:1.5;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#tab-settings #settingsGoalTools.tt-advanced-fold>summary::-webkit-details-marker{display:none}
+#tab-settings #settingsGoalTools.tt-advanced-fold>summary small{font-size:12px;color:var(--mute);font-weight:450;text-align:right;line-height:1.4}
+#tab-settings #settingsGoalTools.tt-advanced-fold[open]{padding-bottom:9px}
+#tab-settings #settingsGoalTools.tt-advanced-fold>details{margin:8px 10px 0}
+#tab-settings #settingsGoalTools.tt-advanced-fold>summary:focus-visible{
+  outline:3px solid var(--focus);outline-offset:-3px}
+#tab-settings #settingsGoalTools.tt-advanced-fold>summary:active,
+#tab-settings #settingsInformation.tt-information-fold>summary:active,
+#tab-settings .settings-fold>summary:active{filter:brightness(.985)}
+#tab-settings #autoSyncSummary{max-width:56%;overflow-wrap:anywhere}
+@media(max-width:400px){
+  #tab-settings :is(#autoSyncDetails,#settingsDataPanel)>summary{align-items:flex-start;flex-wrap:wrap}
+  #tab-settings #autoSyncSummary{max-width:100%;text-align:left}
+}

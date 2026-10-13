@@ -88,7 +88,7 @@ assert(skin.includes('#tab-settings>#toeicAutoLinkPanel{order:1}'));
 assert(skin.includes('#tab-settings>#settingsGoalTools{order:6}'));
 // Embedded UI regression: bank and quality notes still exist, now closed by default.
 assert(html.includes('<details class="settings-section-group tt-information-fold" id="settingsInformation">'));
-assert(html.includes('<summary><span>題庫與系統資訊</span>'));
+assert(html.includes('<summary><span>03 · 題庫與學習管理</span>'));
 assert(html.includes('id="qualityDisclosure"'));
 assert(html.includes('id="qualityStatus"'));
 assert(html.includes('id="settingsStorageHealth"'));
