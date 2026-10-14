@@ -27,3 +27,12 @@ html[data-appearance='dark']{--v7-subject:#8eddbb;--v7-verb:#8dbbf7;--v7-object:
 html[data-appearance='light']{--v7-subject:#216a4e;--v7-verb:#1f5e9e;--v7-object:#8843a7;--v7-modifier:#86601c;--v7-complement:#9c385b}
 @media(prefers-color-scheme:dark){html[data-appearance='system']{--v7-subject:#8eddbb;--v7-verb:#8dbbf7;--v7-object:#d7a6ec;--v7-modifier:#ebc57b;--v7-complement:#f6a8c3}}
 @media(max-width:480px){#tab-vocab .v7-word-actions button{flex:1 1 100px}#tab-practice .v7-syntax-line{font-size:15px}}
+
+/* V7.1: settings belong to Goal Manager; 5 focused learning destinations. */
+.tt-quiet-header{display:flex;align-items:center;gap:8px}
+.tt-central-gear{width:42px;height:42px;display:grid;place-items:center;
+  color:#fff;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.10);
+  border-radius:12px;line-height:1;text-decoration:none;font-size:21px;
+  -webkit-tap-highlight-color:transparent}
+.tt-central-gear:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:700px){.main-nav .nav-btn{flex:1 1 0;min-width:0}}

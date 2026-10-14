@@ -26,7 +26,7 @@ WIDTHS = (360, 390, 430, 768, 1280)
 HEIGHTS = (800, 844, 932, 1024, 900)
 THEMES = ("light", "dark")
 GOAL_VIEWS = ("dash", "goals", "today", "calendar", "activity", "scholarship", "stats")
-TOEIC_VIEWS = ("home", "reading", "vocab", "grammar", "mistakes", "history", "settings")
+TOEIC_VIEWS = ("home", "reading", "vocab", "grammar", "mistakes", "history")
 MIME = {".js": "application/javascript", ".css": "text/css", ".json": "application/json",
         ".html": "text/html; charset=utf-8", ".webmanifest": "application/manifest+json"}
 
@@ -76,9 +76,9 @@ def self_test() -> None:
         assert static_content_type(Path("script.js")) == "application/javascript"
         assert static_content_type(Path("app.css")) == "text/css"
         assert len(WIDTHS) == len(HEIGHTS) and min(WIDTHS) <= 360
-        assert len(GOAL_VIEWS) == 7 and len(TOEIC_VIEWS) == 7
+        assert len(GOAL_VIEWS) == 7 and len(TOEIC_VIEWS) == 6
         assert "".join(THEMES) == "lightdark"
-    print("PASS: isolated URL routing, no traversal/external fetch, safe MIME, 5 widths × 2 themes, 14 view targets")
+    print("PASS: isolated URL routing, no traversal/external fetch, safe MIME, 5 widths × 2 themes, 13 view targets")
 
 
 def report_issue(entries: list[dict], app: str, view: str, width: int, theme: str, message: str) -> None:

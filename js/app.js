@@ -175,8 +175,8 @@ function syncVocabView(){
   byId('vocabLibraryPanel').hidden=!library;
   byId('vocabPageTitle').textContent=library?'單字庫與收藏':'單字記憶測驗';
   byId('vocabPageDescription').textContent=library
-    ?'查閱詞義、搭配詞與收藏，獨立於正式測驗的抽題條件。'
-    :'單字可選英翻中、中翻英、雙向混合或搭配詞。交卷前不揭露答案；交卷後安排間隔複習。';
+    ?'搜尋・收藏・搭配詞'
+    :'交卷後顯示解析';
   byId('vocabViewTabs').querySelectorAll('[data-vocab-view]').forEach(button=>{
     const chosen=button.dataset.vocabView===vocabView;
     button.classList.toggle('active',chosen);
@@ -203,6 +203,7 @@ function renderSettings(){
   if(status)status.textContent=storageBlocked?'學習資料儲存異常：'+(storeReason||'請先下載備份'):'學習紀錄與外觀偏好分開儲存；Goal Manager 維持只讀核對';
 }
 function tab(id){
+  if(id==='settings'){window.location.assign('/my-goal-manager/#settings');return}
   if(id==='analysis')id='mistakes';
   if(!['home','vocab','reading','grammar','mistakes','history','settings'].includes(id))return;
   if(quiz&&id!==quiz.context){notify('試卷進行中，請先交卷或暫存離開。');id=quiz.context;}
@@ -233,7 +234,7 @@ function tab(id){
     byId('practiceQuestionTitle').textContent=id==='grammar'?'日常文法題組':'日常閱讀題組';
     byId('practiceEyebrow').textContent=id==='grammar'?'GRAMMAR · UNDERSTAND THE PATTERN':'READING · UNDERSTAND THE CONTEXT';
     byId('practicePageDescription').textContent=id==='grammar'
-      ?'選擇文法主題，整份交卷後才會公布規則與詳解。':'閱讀原文並完成題組，整份交卷後才解鎖中文、句型與答案。';
+      ?'文法題組・交卷後解析':'閱讀題組・交卷後解析';
     [...byId('practicePart').options].forEach(opt=>{
       opt.hidden=opt.value!=='all'&&(id==='grammar'?opt.value==='7':opt.value==='5');
     });
@@ -316,7 +317,7 @@ function renderWordLookup(){
     const coll=V7.collocation(card);
     const detail=coll
       ? `<div class="v7-word-context"><span class="v7-colloc-term" lang="en">${esc(coll.phrase)}</span><span class="v7-colloc-translation"> · ${esc(coll.meaning)}</span><details class="v7-example"><summary>原字卡例句（不一定含完整搭配詞）</summary><p lang="en">${esc(coll.example)}</p></details><div class="v7-word-actions"><button class="btn btn-light" type="button" data-speak-collocation="${esc(coll.phrase)}">▶ 聆聽搭配詞</button></div></div>`
-      : `<div class="v7-word-context">搭配詞尚未校對，不以詞性提示冒充詞組。</div>`;
+      : '';
     return `<div class="word-row"><div><b lang="en">${esc(card.word)}</b><small>${esc(card.pos)} · ${esc(card.zh)}</small>${detail}</div><button class="btn btn-light" type="button" data-bookmark="${esc(card.id)}" aria-pressed="${saved}">${saved?'已收藏 ✓':'＋ 收藏'}</button></div>`;
   }).join('')+`<nav class="word-pages" aria-label="單字查詢分頁"><button class="btn btn-light" type="button" data-vocab-page="prev" ${vocabListPage===0?'disabled':''}>上一頁</button><span aria-live="polite">${vocabListPage+1} / ${pages} 頁 · ${first+1}–${Math.min(first+VOCAB_PAGE_SIZE,available.length)} 張</span><button class="btn btn-light" type="button" data-vocab-page="next" ${vocabListPage+1===pages?'disabled':''}>下一頁</button></nav>`;
   out.querySelectorAll('[data-bookmark]').forEach(button=>button.onclick=()=>toggleBookmark(button.dataset.bookmark));
@@ -339,10 +340,10 @@ function renderVocab(){
   const chosenMode=byId('vocabMode').value;
   const eligible=chosenMode==='collocation'?cards.filter(c=>V7.collocation(c)):cards;
   const dueCount=eligible.filter(c=>Core.reviewIsDue(state.review[c.id])).length;
-  byId('vocabPoolLabel').textContent=`本模式 ${eligible.length} 張字卡，待學／到期 ${dueCount} 張`;
+  byId('vocabPoolLabel').textContent=`待學／到期 ${dueCount} / ${eligible.length}`;
   byId('v7ModeHint').textContent=chosenMode==='collocation'
-    ?'搭配詞測驗只使用經校對的 72 個詞組；其他 728 張字卡仍能參加雙向單字測驗。'
-    :'使用現有 800 張字卡，原 ID、錯題記錄與間隔複習不變。';
+    ?'72 組已校對搭配詞'
+    :'';
   syncVocabView();
   if(!quiz||quiz.context!=='vocab'){
     byId('vocabSession').hidden=true;
@@ -565,7 +566,7 @@ function renderQuiz(){
   const clockText=draft.timed?`剩餘 ${timeStr(Math.max(0,draft.durationSeconds-Exam.elapsed(draft)))}`:timeStr(active?.seconds);
   let html=`<div class="panel exam-panel"><div class="session-head"><span>第 ${draft.index+1}/${total} 題 · 已答 ${complete} 題</span><div class="timer" id="quizTimer">${clockText}</div></div>`;
   html+=`<div class="progress"><i style="width:${Math.round(100*complete/total)}%"></i></div>`;
-  html+=`<div class="exam-banner">正式測驗｜交卷前不顯示答案、正確率與解析</div>`;
+  html+=`<div class="exam-banner">交卷後顯示解析</div>`;
   html+=`<div class="question-label">${isVocab?'VOCABULARY':`PART ${q.part} · ${esc(names[q.part])}`} · ${esc(q.tag||'Context')} ${q.docType?' · '+(q.docType==='double'?'雙篇閱讀':'三篇閱讀'):''}</div>`;
   if(q.passage)html+=`<div class="passage" lang="en">${esc(q.passage)}</div>`;
   html+=`<div class="q-stem" lang="${isVocab?'zh-Hant':'en'}">${esc(q.question)}</div><div class="answers">`;
@@ -610,12 +611,15 @@ function goalText(e){
 }
 function summaryEventHtml(ev){
   const eligible=ev.goalSyncEligible;
-  return `<div class="copy-event">目標管理補登建議：<br>日期：${esc(ev.date)}<br>練習類型：${esc(summaryLabel[ev.unit]||ev.unit)}<br>實際專注：${esc(minutesLabel(ev.seconds))}<br>建議任務：${esc(goalText(ev))}<br>${eligible?'符合最低 1 分鐘的匯入候選條件（仍需驗證）':'不足 1 分鐘：保留在訓練紀錄，不列入自動匯入候選'}</div>`;
+  let linked=false;
+  try{const settings=JSON.parse(localStorage.getItem('toeic-trainer:v051-link-settings')||'null');linked=settings?.version===1&&settings.enabled===true}catch(_){}
+  const text=eligible?(linked?'學習已保存 · 目標系統自動核對':'學習已保存 · 可於目標系統啟用連動'):'學習已保存 · 未滿 1 分鐘';
+  return `<div class="copy-event" role="status">${text}</div>`;
 }
 function reviewSection(items,decisions){
   const answers=new Map(decisions.map(d=>[d.id,d]));
   const needReview=decisions.filter(d=>!d.correct).length;
-  return `<section class="post-review" data-review-view="all"><h3>交卷後集中檢討</h3><p class="muted">以下答案、原文依據及中英解析僅在交卷後解鎖。</p>`+
+  return `<section class="post-review" data-review-view="all"><h3>作答解析</h3>`+
     `<div class="review-toolbar"><button class="btn btn-light active" type="button" data-review-filter="all" aria-pressed="true">全部 ${items.length} 題</button><button class="btn btn-light" type="button" data-review-filter="wrong" aria-pressed="false">只看錯題 ${needReview} 題</button></div>`+
     items.map((q,i)=>{
       const d=answers.get(q.id),ok=!!d?.correct,letter=x=>Number.isInteger(x)?String.fromCharCode(65+x):'未作答';

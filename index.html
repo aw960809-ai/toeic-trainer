@@ -35,7 +35,7 @@
 <header class="masthead">
   <div class="masthead-inner">
     <div class="identity"><span class="brand-icon" aria-hidden="true">T<span>·</span></span><div><small>INDEPENDENT LEARNING LAB</small><strong>TOEIC Trainer</strong></div></div>
-    <div class="app-status" id="storageStatus" role="status">本機儲存</div>
+    <div class="tt-quiet-header"><div class="app-status" id="storageStatus" role="status">本機儲存</div><a class="tt-central-gear" href="/my-goal-manager/#settings" aria-label="前往目標系統設定">⚙</a></div>
   </div>
 </header>
 <div class="site-shell">
@@ -45,7 +45,6 @@
     <button class="nav-btn" data-tab="vocab">單字</button>
     <button class="nav-btn" data-tab="grammar">文法</button>
     <button class="nav-btn" data-tab="analysis">分析</button>
-    <button class="nav-btn" data-tab="settings">設定</button>
   </nav>
   <main id="main">
     <div class="panel draft-resume-banner" id="draftBanner" hidden role="status"><div><b>尚有未交卷的試卷</b><p id="draftLabel">可恢復先前進度</p></div><div class="button-row"><button class="btn btn-primary" id="resumeDraft" type="button">繼續作答</button><button class="btn btn-light" id="discardDraft" type="button">放棄草稿</button></div></div>
@@ -53,7 +52,7 @@
       <div class="intro-banner home-compact-hero">
         <div class="eyebrow">TODAY'S TOEIC PRACTICE</div>
         <h1>今天練哪一項？</h1>
-        <p>閱讀、單字、文法，整份交卷後才公布答案與解析。</p>
+        <p>選擇一項開始。</p>
         <div class="hero-actions" aria-label="快速開始訓練"><button class="btn btn-primary" id="homeStartPractice" type="button">閱讀</button><button class="btn btn-light" id="homeStartVocab" type="button">單字</button><button class="btn btn-light" id="homeStartGrammar" type="button">文法</button></div>
       </div>
       <div class="metrics" id="homeMetrics" aria-label="學習統計"></div>
@@ -70,21 +69,21 @@
 
     </section>
     <section id="tab-vocab" class="tab-page" hidden>
-      <div class="section-head"><div><div class="eyebrow">VOCABULARY · SUBMIT-TO-REVIEW</div><h1 id="vocabPageTitle">單字記憶測驗</h1><p id="vocabPageDescription">單字可選英翻中、中翻英、混合及經校對搭配詞；全卷交卷後才顯示答案與詳解。</p></div></div>
+      <div class="section-head"><div><div class="eyebrow">VOCABULARY</div><h1 id="vocabPageTitle">單字記憶測驗</h1><p id="vocabPageDescription">英翻中・中翻英・搭配詞</p></div></div>
       <div class="vocab-view-switch" id="vocabViewTabs" role="group" aria-label="單字頁功能">
         <button type="button" class="active" data-vocab-view="test" aria-pressed="true">記憶測驗</button>
         <button type="button" data-vocab-view="library" aria-pressed="false">單字庫／收藏</button>
       </div>
       <div id="vocabIntro" class="panel vocab-compact-setup">
         <div class="vocab-launch"><label class="field" for="vocabCount"><span>本次字卡數</span><select id="vocabCount" aria-label="本次練習單字數"><option value="5">5 張</option><option value="10" selected>10 張</option><option value="20">20 張</option></select></label><label class="field v7-mode-field" for="vocabMode"><span>練習方式</span><select id="vocabMode" aria-label="選擇單字練習方式"><option value="mixed" selected>雙向混合（英翻中＋中翻英）</option><option value="en-zh">英翻中</option><option value="zh-en">中翻英</option><option value="collocation">搭配詞辨認＋填空</option></select></label><button class="btn btn-primary" id="startVocab" type="button">開始單字測驗</button></div>
-        <p class="muted vocab-help">優先練習尚未學習與到期單字，全部交卷後才批改。可在上方切換至「單字庫／收藏」查詢、整理字卡。</p>
+
         <div class="vocab-pool-summary" id="vocabPoolLabel" aria-live="polite"></div>
 <p id="v7ModeHint" class="v7-mode-hint" role="status">雙向混合不會更動舊字卡 ID，完整交卷後才安排複習。</p>
 
       </div>
       <div id="vocabLibraryPanel" class="panel vocab-library-panel" hidden>
         <div class="vocab-library-header"><div><div class="eyebrow">WORD BANK</div><h2>搜尋與收藏</h2></div><small id="wordDictionaryCount" role="status">800 張可查詢</small></div>
-        <p class="vocab-library-lead">快速搜尋、分類與收藏單字。每頁最多 8 筆；測驗時不開放查詢答案。</p>
+
         <div class="word-dictionary" id="wordDictionary">
           <div class="word-dictionary-body"><div class="tt-vocab-controls">
             <div class="tt-tabs tt-vocab-tabs" id="vocabQuickFilters" role="group" aria-label="單字快速篩選">
@@ -139,7 +138,7 @@
           <button class="btn btn-primary" id="openReadingLesson" type="button">開始文章測驗</button>
         </div>
         <p class="reading-level-hint" id="readingLevelHint" aria-live="polite"></p>
-        <p class="fineprint">閱讀原文後回答整份理解題；交卷前不顯示翻譯與解析。完成交卷後才建立 Session 並開放逐句精讀。</p>
+
         <div id="readingLessonPanel" hidden></div>
       </div>
       <div id="grammarCoach" class="panel" hidden>
@@ -171,9 +170,9 @@
           <label class="field"><span>題目數</span><select id="practiceCount"><option value="5">5 題</option><option value="10" selected>10 題</option><option value="20">20 題</option></select></label>
         </div>
         <div class="setup-bottom"><span id="practicePoolHint" class="muted"></span><button id="startPractice" class="btn btn-primary">開始訓練</button></div>
-        <p class="fineprint">整份交卷後才批改；正確率不是 ETS 官方分數。</p></div>
+        </div>
       </details>
-      <details class="panel official-mock-panel collapsible-session-setup" id="officialMockPanel"><summary><span>完整閱讀模考</span><small>100 題／75 分鐘</small></summary><div class="setup-content"><p>依官方閱讀配置組卷：Part 5：30 題、Part 6：16 題、Part 7：54 題；75 分鐘計時，時間到自動交卷。包含原創新題與保留原題號的既有篇章，非 ETS 官方試卷。</p><div class="setup-bottom"><span class="muted">10 篇單篇（29 題）及 5 組雙／三篇（25 題）。整份交卷後批改。</span><button class="btn btn-primary" id="startOfficialMock" type="button">開始 100 題模考</button></div></div></details>
+      <details class="panel official-mock-panel collapsible-session-setup" id="officialMockPanel"><summary><span>完整閱讀模考</span><small>100 題／75 分鐘</small></summary><div class="setup-content"><p>75 分鐘 · 交卷後批改（非官方題卷）</p><div class="setup-bottom"><span class="muted">Part 5–7</span><button class="btn btn-primary" id="startOfficialMock" type="button">開始 100 題模考</button></div></div></details>
       <div id="practiceSession" hidden></div>
       <div id="practiceFinished" hidden></div>
     </section>
@@ -182,12 +181,12 @@
       <button type="button" data-analysis-tab="history" aria-pressed="false">學習紀錄</button>
     </div>
     <section id="tab-mistakes" class="tab-page" hidden>
-      <div class="section-head"><div><div class="eyebrow">ERROR REVIEW · ADAPTIVE PRACTICE</div><h1>錯題與弱點</h1><p>追蹤閱讀理解與文法易錯類型，持續重練。</p></div></div>
+      <div class="section-head"><div><div class="eyebrow">ERROR REVIEW · ADAPTIVE PRACTICE</div><h1>錯題與弱點</h1></div></div>
       <div id="mistakesMetrics" class="metrics"></div><div id="weaknessOverview" class="panel" hidden></div>
       <div class="panel"><div class="section-title"><div><small>PERSONAL ERROR POOL</small><h2>需要再練的題目</h2></div><button class="btn btn-light" id="startMistakes">開始錯題測驗 →</button></div><div id="mistakesList"></div></div>
     </section>
     <section id="tab-history" class="tab-page" hidden>
-      <div class="section-head"><div><div class="eyebrow">SESSIONS · PRIVATE LOCAL DATA</div><h1>學習紀錄</h1><p>每次完成練習產生獨立 Session；不自動寫入另一個系統。</p></div></div>
+      <div class="section-head"><div><div class="eyebrow">SESSIONS · PRIVATE LOCAL DATA</div><h1>學習紀錄</h1></div></div>
       <div class="panel" id="historyPanel"><div class="section-title"><div><small>ACTUAL LEARNING</small><h2>近期完成紀錄</h2></div></div><div id="sessionList"></div></div>
 
 
@@ -281,7 +280,7 @@
       </details>
     </section>
   </main>
-  <footer><span>TOEIC Trainer v0.5.2 · 獨立安裝／可選自動連動</span><span>資料只儲存在此瀏覽器（可自行匯出）</span></footer>
+  <footer><span>TOEIC Trainer V7.1</span><span>設定請至目標系統</span></footer>
 </div>
 <dialog class="saved-review-dialog" id="savedReviewDialog"><div class="dialog-head"><button type="button" class="btn btn-light" id="closeSavedReview">關閉</button></div><div id="savedReviewBody"></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

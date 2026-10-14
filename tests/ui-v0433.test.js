@@ -17,8 +17,8 @@ for(const id of ['tab-home','tab-vocab','tab-practice','tab-mistakes','tab-histo
   assert(ids.includes(id),'missing '+id);
 }
 const mainNav=(html.match(/<nav class="main-nav"[\s\S]*?<\/nav>/)||[])[0]||'';
-assert.equal((mainNav.match(/class="nav-btn/g)||[]).length,6,'exactly six top-level destinations');
-for(const dest of ['home','reading','vocab','grammar','analysis','settings'])assert(mainNav.includes('data-tab="'+dest+'"'));
+assert.equal((mainNav.match(/class="nav-btn/g)||[]).length,5,'exactly five learning destinations');
+for(const dest of ['home','reading','vocab','grammar','analysis'])assert(mainNav.includes('data-tab="'+dest+'"'));
 assert(!mainNav.includes('data-tab="history"')&&!mainNav.includes('data-tab="mistakes"'));
 const history=html.split('<section id="tab-history"')[1].split('<section id="tab-settings"')[0];
 const home=html.split('<section id="tab-home"')[1].split('<section id="tab-vocab"')[0];
