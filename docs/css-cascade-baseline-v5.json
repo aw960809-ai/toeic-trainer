@@ -5,7 +5,8 @@
     "css/style.css",
     "css/layout-v043.css",
     "css/preferences-v0433.css",
-    "css/ui-layout-v4.css"
+    "css/ui-layout-v4.css",
+    "css/v7-learning.css"
   ],
   "files": {
     "css/layout-v043.css": {
@@ -33,6 +34,13 @@
       "bytes": 8065,
       "blocks": 95,
       "important": 19,
+      "duplicate_scoped_rules": 0,
+      "duplicate_declarations": 0
+    },
+    "css/v7-learning.css": {
+      "bytes": 2634,
+      "blocks": 30,
+      "important": 0,
       "duplicate_scoped_rules": 0,
       "duplicate_declarations": 0
     }

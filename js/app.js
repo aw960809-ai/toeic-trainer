@@ -2,8 +2,9 @@
 (function(){
 'use strict';
 const Prefs=window.ToeicTrainerPreferences;
+const V7=window.ToeicTrainerV7;
 const Core=window.ToeicTrainerCore,Content=window.ToeicTrainerContent,Advanced=window.ToeicTrainerAdvanced,Bridge=window.ToeicTrainerBridge,V04=window.ToeicTrainerV04,V041=window.ToeicTrainerV041,V042=window.ToeicTrainerV042,BankAudit=window.ToeicTrainerBankAudit,LengthPolicy=window.ToeicTrainerLengthPolicy,Exam=window.ToeicTrainerExam,Quality=window.ToeicTrainerQuality,Quality043=window.ToeicTrainerQualityV043;
-if(!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
+if(!V7||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
 const legacyGrammarTopics={deadline:'prepositions','word-form':'word-form',determiner:'word-form',cause:'condition',
   'present-perfect':'tense',comparison:'comparison',collocation:'prepositions',agreement:'agreement',
   infinitive:'infinitive',condition:'condition',passive:'passive'};
@@ -175,7 +176,7 @@ function syncVocabView(){
   byId('vocabPageTitle').textContent=library?'單字庫與收藏':'單字記憶測驗';
   byId('vocabPageDescription').textContent=library
     ?'查閱詞義、搭配詞與收藏，獨立於正式測驗的抽題條件。'
-    :'整組字彙四選一。交卷前不顯示詞義、答對率或解析；交卷後安排下一次間隔複習。';
+    :'單字可選英翻中、中翻英、雙向混合或搭配詞。交卷前不揭露答案；交卷後安排間隔複習。';
   byId('vocabViewTabs').querySelectorAll('[data-vocab-view]').forEach(button=>{
     const chosen=button.dataset.vocabView===vocabView;
     button.classList.toggle('active',chosen);
@@ -312,9 +313,14 @@ function renderWordLookup(){
   const first=vocabListPage*VOCAB_PAGE_SIZE;
   out.innerHTML=available.slice(first,first+VOCAB_PAGE_SIZE).map(card=>{
     const saved=state.savedWordIds.includes(card.id);
-    return `<div class="word-row"><div><b lang="en">${esc(card.word)}</b><small>${esc(card.pos)} · ${esc(card.zh)}<span> · ${esc(card.collocation)}</span></small></div><button class="btn btn-light" type="button" data-bookmark="${esc(card.id)}" aria-pressed="${saved}">${saved?'已收藏 ✓':'＋ 收藏'}</button></div>`;
+    const coll=V7.collocation(card);
+    const detail=coll
+      ? `<div class="v7-word-context"><span class="v7-colloc-term" lang="en">${esc(coll.phrase)}</span><span class="v7-colloc-translation"> · ${esc(coll.meaning)}</span><details class="v7-example"><summary>原字卡例句（不一定含完整搭配詞）</summary><p lang="en">${esc(coll.example)}</p></details><div class="v7-word-actions"><button class="btn btn-light" type="button" data-speak-collocation="${esc(coll.phrase)}">▶ 聆聽搭配詞</button></div></div>`
+      : `<div class="v7-word-context">搭配詞尚未校對，不以詞性提示冒充詞組。</div>`;
+    return `<div class="word-row"><div><b lang="en">${esc(card.word)}</b><small>${esc(card.pos)} · ${esc(card.zh)}</small>${detail}</div><button class="btn btn-light" type="button" data-bookmark="${esc(card.id)}" aria-pressed="${saved}">${saved?'已收藏 ✓':'＋ 收藏'}</button></div>`;
   }).join('')+`<nav class="word-pages" aria-label="單字查詢分頁"><button class="btn btn-light" type="button" data-vocab-page="prev" ${vocabListPage===0?'disabled':''}>上一頁</button><span aria-live="polite">${vocabListPage+1} / ${pages} 頁 · ${first+1}–${Math.min(first+VOCAB_PAGE_SIZE,available.length)} 張</span><button class="btn btn-light" type="button" data-vocab-page="next" ${vocabListPage+1===pages?'disabled':''}>下一頁</button></nav>`;
   out.querySelectorAll('[data-bookmark]').forEach(button=>button.onclick=()=>toggleBookmark(button.dataset.bookmark));
+  out.querySelectorAll('[data-speak-collocation]').forEach(button=>button.onclick=()=>speak(button.dataset.speakCollocation));
   out.querySelectorAll('[data-vocab-page]').forEach(button=>button.onclick=()=>{
     vocabListPage+=button.dataset.vocabPage==='prev'?-1:1;
     renderWordLookup();
@@ -330,7 +336,13 @@ function toggleBookmark(id){
   if(readingRun)renderReadingLesson();
 }
 function renderVocab(){
-  byId('vocabPoolLabel').textContent=`共 ${cards.length} 張字卡，待學／到期 ${countDue()} 張`;
+  const chosenMode=byId('vocabMode').value;
+  const eligible=chosenMode==='collocation'?cards.filter(c=>V7.collocation(c)):cards;
+  const dueCount=eligible.filter(c=>Core.reviewIsDue(state.review[c.id])).length;
+  byId('vocabPoolLabel').textContent=`本模式 ${eligible.length} 張字卡，待學／到期 ${dueCount} 張`;
+  byId('v7ModeHint').textContent=chosenMode==='collocation'
+    ?'搭配詞測驗只使用經校對的 72 個詞組；其他 728 張字卡仍能參加雙向單字測驗。'
+    :'使用現有 800 張字卡，原 ID、錯題記錄與間隔複習不變。';
   syncVocabView();
   if(!quiz||quiz.context!=='vocab'){
     byId('vocabSession').hidden=true;
@@ -350,14 +362,21 @@ function startVocab(){
   if(quiz||readingRun)return notify('請先結束或暫存目前的試卷');
   if(savedDraft)return notify('已有未完成的試卷，請先繼續或選擇放棄草稿。');
   const count=Number(byId('vocabCount').value)||10;
+  const mode=byId('vocabMode').value;
+  // Keep the original all-card pool and due-list contract used by the V6.1 regression suite.
   // Dictionary filters are browse-only and must never silently constrain formal tests.
   const pool=cards;const due=pool.filter(c=>Core.reviewIsDue(state.review[c.id]));
-  const rest=pool.filter(c=>!due.includes(c));
+  // Collocation eligibility is applied only after that stable V6.1 extraction.
+  const eligible=mode==='collocation'?pool.filter(c=>V7.collocation(c)):pool;
+  const eligibleDue=mode==='collocation'?due.filter(c=>V7.collocation(c)):due;
+  const rest=eligible.filter(c=>!eligibleDue.includes(c));
   const randomize=x=>x.map(item=>({item,r:Math.random()})).sort((a,b)=>a.r-b.r).map(x=>x.item);
-  const selected=[...randomize(due),...randomize(rest)].slice(0,count);
+  const selected=[...randomize(eligibleDue),...randomize(rest)].slice(0,count);
   if(!selected.length)return notify('目前沒有可用的單字');
-  const items=Exam.vocabQuestions(selected.map(c=>c),{random:Math.random});
+  let items;try{items=V7.questions(selected,{mode,bank:eligible,random:Math.random})}
+  catch(error){notify('單字組卷失敗：'+error.message);return}
   const draft=Exam.start(items,{context:'vocab',mode:'vocabulary',type:'vocab'});
+  draft.vocabMode=mode; // detail only; legacy Session.mode remains 'vocabulary' for Goal Manager sync.
   quiz={items,draft,context:'vocab',mode:'vocabulary',part:'all',topic:null};
   vocabView='test';startClock('practice');saveDraft();tab('vocab');renderQuiz();revealActiveExam('#vocabSession');
 }
@@ -549,7 +568,7 @@ function renderQuiz(){
   html+=`<div class="exam-banner">正式測驗｜交卷前不顯示答案、正確率與解析</div>`;
   html+=`<div class="question-label">${isVocab?'VOCABULARY':`PART ${q.part} · ${esc(names[q.part])}`} · ${esc(q.tag||'Context')} ${q.docType?' · '+(q.docType==='double'?'雙篇閱讀':'三篇閱讀'):''}</div>`;
   if(q.passage)html+=`<div class="passage" lang="en">${esc(q.passage)}</div>`;
-  html+=`<div class="q-stem" lang="en">${esc(q.question)}</div><div class="answers">`;
+  html+=`<div class="q-stem" lang="${isVocab?'zh-Hant':'en'}">${esc(q.question)}</div><div class="answers">`;
   q.options.forEach((option,i)=>{
     html+=`<button class="answer${choice===i?' picked':''}" type="button" data-answer="${i}" aria-pressed="${choice===i}"><span class="letter">${String.fromCharCode(65+i)}</span><span>${esc(option)}</span></button>`;
   });
@@ -629,6 +648,7 @@ function finishQuiz(timedOut=false){
   event.answerReview=score.decisions.map(d=>({id:d.id,choice:d.choice}));
   if(source.context==='vocab')event.vocabReview=reviewItems.map(q=>({id:q.id,options:q.options,answer:q.answer,
     question:q.question,passage:q.passage,reason:q.reason,reasonEn:q.reasonEn,part:0}));
+  if(source.context==='vocab')event.vocabMode=source.draft.vocabMode||'en-zh';
   event.unanswered=score.unanswered;event.timedOut=timedOut;
   next.sessions.push(event);state=next;
   if(!persist()){state=old;notify('無法保存交卷結果，原本試卷及紀錄均已保留');return}
@@ -826,7 +846,14 @@ function finishReadingLesson(){
   let out=`<div class="reading-study"><div class="eyebrow">SUBMITTED · ANSWERS UNLOCKED</div><h2>${esc(lesson.title)} · 測驗完成</h2>`+
    `<div class="result-summary"><div><b>${score.total}</b><span>理解題</span></div><div><b>${event.accuracy}%</b><span>正確率</span></div><div><b>${Math.floor(seconds/60)} 分</b><span>專注時間</span></div></div>${summaryEventHtml(event)}`+
    `<h3>逐句翻譯與句型解析</h3><div class="sentence-list">`;
-  lesson.sentences.forEach((sentence,i)=>out+=`<details class="sentence-card"><summary class="sentence-en" lang="en">${esc(sentence.en)}</summary><div class="sentence-notes"><p>${esc(sentence.zh)}</p><p>${esc(sentence.note)}</p></div></details>`);
+  out+=`<div class="v7-syntax-legend" aria-label="句型標記說明"><span><span class="v7-syntax-token" data-role="subject">主詞 S</span></span><span><span class="v7-syntax-token" data-role="verb">動詞 V</span></span><span><span class="v7-syntax-token" data-role="object">受詞 O</span></span><span><span class="v7-syntax-token" data-role="complement">補語 C</span></span><span><span class="v7-syntax-token" data-role="modifier">修飾／子句 M</span></span></div>`;
+  lesson.sentences.forEach(sentence=>{
+    const parts=V7.analyzeSentence(sentence.en);
+    const syntax=parts
+      ? `<p class="v7-syntax-line" lang="en">${parts.map(p=>`<span class="v7-syntax-token" data-role="${p.type}">${esc(p.text)}</span>`).join(' ')}</p>`
+      : '<p class="v7-no-annotation">本句尚無逐字校對的語法色塊；原文、翻譯及既有註解照常保留。</p>';
+    out+=`<details class="sentence-card"><summary class="sentence-en" lang="en">${esc(sentence.en)}</summary><div class="sentence-notes">${syntax}<p>${esc(sentence.zh)}</p><p>${esc(sentence.note)}</p></div></details>`;
+  });
   const readingMistakeShortcut=score.correct<score.total
     ?'<button id="reviewMistakesAfterReading" class="btn btn-light" type="button">查看錯題與弱點</button>':'';
   out+='</div>'+reviewSection(qs,score.decisions)+
@@ -999,7 +1026,7 @@ function attach(){
   }
   byId('homeStartPractice').onclick=()=>goQuick('reading');byId('homeStartVocab').onclick=()=>tab('vocab');byId('homeStartGrammar').onclick=()=>goQuick('grammar');
   document.querySelectorAll('[data-quick]').forEach(btn=>btn.onclick=()=>goQuick(btn.dataset.quick));
-  byId('startVocab').onclick=startVocab;byId('startPractice').onclick=()=>startPractice();
+  byId('startVocab').onclick=startVocab;byId('vocabMode').onchange=renderVocab;byId('startPractice').onclick=()=>startPractice();
   byId('startMistakes').onclick=startMistakes;
   byId('startOfficialMock').onclick=startOfficialMock;
   byId('resumeDraft').onclick=resumeExam;
