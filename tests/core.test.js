@@ -84,7 +84,13 @@ assert(sw.includes("const VERSION='toeic-trainer-independent-v0.5.2'"));
 assert(sw.includes("'./data/advanced.js'"));
 assert(html.includes('src="./data/advanced.js?v=v0.5.1-independent-pwa-20261012"'));
 assert(html.includes('src="./js/bridge.js?v=v0.5.2-goal-backup-review-20261012"'));
-for(const nav of ['home','reading','vocab','grammar','analysis','settings'])assert(html.includes(`data-tab="${nav}"`));
+// V7.1: five learning tabs, with the only settings entry in Goal Manager.
+for(const nav of ['home','reading','vocab','grammar','analysis'])
+  assert(html.includes(`data-tab="${nav}"`),'missing learning tab: '+nav);
+assert(!html.includes('data-tab="settings"'),'the duplicate Trainer settings navigation must be removed');
+assert(html.includes('href="/my-goal-manager/#settings"'),'Goal Manager central settings link must remain');
+assert(ui.includes("if(id==='settings'){window.location.assign('/my-goal-manager/#settings');return}"),
+  'legacy Trainer settings callers must redirect to Goal Manager');
 for(const old of ['mistakes','history'])assert(html.includes(`data-analysis-tab="${old}"`),'preserve individual analysis destinations');
 assert(!html.includes('data-tab="practice"')&&!html.includes('data-quick="listening"'));
 assert(!html.includes('value="2"')&&!html.includes('value="3"')&&!html.includes('value="4"'));
