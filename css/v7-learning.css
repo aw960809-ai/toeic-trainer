@@ -1,0 +1,29 @@
+/* TOEIC Trainer V7 — scoped study UI; accessible contrast in light/dark/system. */
+#tab-vocab .v7-mode-field{width:100%;min-width:0}
+#tab-vocab .v7-mode-field select{min-width:0;width:100%;min-height:46px}
+#tab-vocab .v7-mode-field select:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+#tab-vocab .v7-mode-hint{margin:6px 0 0;color:var(--mute);font-size:12px;line-height:1.6}
+#tab-vocab .v7-word-context{margin:7px 0 0;font-size:12px;line-height:1.65;color:var(--mute)}
+#tab-vocab .v7-colloc-term{color:var(--ink);font-weight:750}
+#tab-vocab .v7-colloc-translation{font-weight:600;color:var(--mute)}
+#tab-vocab .v7-word-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+#tab-vocab .v7-word-actions button{min-height:38px;padding:6px 10px;font-size:12px}
+#tab-vocab .word-row>div{min-width:0;flex:1}
+#tab-vocab .word-row .v7-example{white-space:normal;overflow-wrap:anywhere}
+#tab-vocab .word-row .v7-example summary{cursor:pointer;font-size:12px;color:var(--sage);padding:7px 0}
+#tab-vocab .word-row .v7-example p{color:var(--ink);margin:0 0 7px;font-size:12px}
+#tab-practice .v7-syntax-legend{display:flex;gap:7px 10px;flex-wrap:wrap;align-items:center;
+  border:1px solid var(--line);background:var(--paper-2);padding:10px;border-radius:11px;margin:11px 0}
+#tab-practice .v7-syntax-legend span{font-size:12px}
+#tab-practice .v7-syntax-line{line-height:1.9;white-space:normal;overflow-wrap:anywhere;padding:8px 0;font-size:16px}
+#tab-practice .v7-syntax-token{border-bottom:2px solid currentColor;border-radius:3px;padding:1px 2px;font-weight:650}
+#tab-practice .v7-syntax-token[data-role='subject']{color:var(--v7-subject,#26775b)}
+#tab-practice .v7-syntax-token[data-role='verb']{color:var(--v7-verb,#206cb5)}
+#tab-practice .v7-syntax-token[data-role='object']{color:var(--v7-object,#9b5bb7)}
+#tab-practice .v7-syntax-token[data-role='modifier']{color:var(--v7-modifier,#9d6a1b)}
+#tab-practice .v7-syntax-token[data-role='complement']{color:var(--v7-complement,#b24a75)}
+#tab-practice .v7-no-annotation{color:var(--mute);font-size:12px}
+html[data-appearance='dark']{--v7-subject:#8eddbb;--v7-verb:#8dbbf7;--v7-object:#d7a6ec;--v7-modifier:#ebc57b;--v7-complement:#f6a8c3}
+html[data-appearance='light']{--v7-subject:#216a4e;--v7-verb:#1f5e9e;--v7-object:#8843a7;--v7-modifier:#86601c;--v7-complement:#9c385b}
+@media(prefers-color-scheme:dark){html[data-appearance='system']{--v7-subject:#8eddbb;--v7-verb:#8dbbf7;--v7-object:#d7a6ec;--v7-modifier:#ebc57b;--v7-complement:#f6a8c3}}
+@media(max-width:480px){#tab-vocab .v7-word-actions button{flex:1 1 100px}#tab-practice .v7-syntax-line{font-size:15px}}
