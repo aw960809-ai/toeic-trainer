@@ -9,7 +9,7 @@ assert.equal((nav.match(/class="nav-btn/g)||[]).length,5);
 assert(!nav.includes('data-tab="settings"'));
 for(const id of ['home','reading','vocab','grammar','analysis'])assert(nav.includes('data-tab="'+id+'"'));
 assert(html.includes('href="/my-goal-manager/#settings"'));
-assert(html.includes('TOEIC Trainer V7.1'));
+assert(html.includes('TOEIC Trainer V7.2'));
 assert(!html.includes('優先練習尚未學習與到期單字，全部交卷後才批改'));
 assert(!html.includes('原創新題與保留原題號的既有篇章'));
 assert(app.includes("if(id==='settings'){window.location.assign('/my-goal-manager/#settings');return}"));

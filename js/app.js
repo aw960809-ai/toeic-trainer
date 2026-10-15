@@ -3,8 +3,9 @@
 'use strict';
 const Prefs=window.ToeicTrainerPreferences;
 const V7=window.ToeicTrainerV7;
+const Smart=window.ToeicTrainerSmartRandom;
 const Core=window.ToeicTrainerCore,Content=window.ToeicTrainerContent,Advanced=window.ToeicTrainerAdvanced,Bridge=window.ToeicTrainerBridge,V04=window.ToeicTrainerV04,V041=window.ToeicTrainerV041,V042=window.ToeicTrainerV042,BankAudit=window.ToeicTrainerBankAudit,LengthPolicy=window.ToeicTrainerLengthPolicy,Exam=window.ToeicTrainerExam,Quality=window.ToeicTrainerQuality,Quality043=window.ToeicTrainerQualityV043;
-if(!V7||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
+if(!V7||!Smart||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
 const legacyGrammarTopics={deadline:'prepositions','word-form':'word-form',determiner:'word-form',cause:'condition',
   'present-perfect':'tense',comparison:'comparison',collocation:'prepositions',agreement:'agreement',
   infinitive:'infinitive',condition:'condition',passive:'passive'};
@@ -369,10 +370,8 @@ function startVocab(){
   const pool=cards;const due=pool.filter(c=>Core.reviewIsDue(state.review[c.id]));
   // Collocation eligibility is applied only after that stable V6.1 extraction.
   const eligible=mode==='collocation'?pool.filter(c=>V7.collocation(c)):pool;
-  const eligibleDue=mode==='collocation'?due.filter(c=>V7.collocation(c)):due;
-  const rest=eligible.filter(c=>!eligibleDue.includes(c));
-  const randomize=x=>x.map(item=>({item,r:Math.random()})).sort((a,b)=>a.r-b.r).map(x=>x.item);
-  const selected=[...randomize(eligibleDue),...randomize(rest)].slice(0,count);
+  const selected=Smart.pickVocab(eligible,{count,review:state.review,
+    dueIds:new Set(due.map(c=>c.id)),sessions:state.sessions});
   if(!selected.length)return notify('目前沒有可用的單字');
   let items;try{items=V7.questions(selected,{mode,bank:eligible,random:Math.random})}
   catch(error){notify('單字組卷失敗：'+error.message);return}
@@ -515,7 +514,9 @@ function startPractice(modeOverride,topicOverride){
   const tier=mode==='mistakes'?'all':byId('practiceTier')?.value||'all';
   let readingId=null;
   if(mode==='reading'&&LengthPolicy.LEVELS[tier]&&(part===null||part===7)){
-    const lesson=LengthPolicy.pickNextArticle(LengthPolicy.filterLessons(V041.readingLessons,tier),state.questionStats,questions);
+    const lessons=LengthPolicy.filterLessons(V041.readingLessons,tier);
+    const lesson=Smart.pickReading(lessons,state.questionStats,questions,state.sessions)||
+      LengthPolicy.pickNextArticle(lessons,state.questionStats,questions);
     readingId=lesson?.id||null;
   }
   // Official-format practice: keep complete Part 6 / Part 7 shared-document groups together.
@@ -524,7 +525,9 @@ function startPractice(modeOverride,topicOverride){
     (!topic||q.grammarTopic===topic)&&(!readingId||q.readingId===readingId)&&
     (tier==='all'||(tier==='legacy'?!q.tier:q.tier===tier))&&
     (mode!=='mistakes'||Core.inMistakePool(state.questionStats[q.id])));
-  const items=Exam.pickPractice(eligible,{count:Number(byId('practiceCount').value),stats:state.questionStats});
+  let items=Smart.pickPractice(eligible,{count:Number(byId('practiceCount').value),
+    stats:state.questionStats,sessions:state.sessions,mode});
+  if(!items.length&&eligible.length)items=Exam.pickPractice(eligible,{count:Number(byId('practiceCount').value),stats:state.questionStats});
   if(!items.length)return notify('本範圍暫無符合的完整題組；請調整題型、難度或題數。');
   // Daily exercises select whole context groups; the requested count is a maximum.
   const context=currentTab==='grammar'?'grammar':'reading';
