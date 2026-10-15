@@ -59,6 +59,16 @@
     opts.splice(p,0,answer);
     return {options:opts,answer:p};
   }
+  function variedDistractors(values,random){
+    // Only vary among the most relevant existing vetted candidates.
+    const pool=values.slice(0,Math.min(36,values.length));
+    for(let i=pool.length-1;i>0;i--){
+      const n=Number(random());
+      const j=Math.floor(Math.max(0,Math.min(.999999999999,Number.isFinite(n)?n:.5))*(i+1));
+      [pool[i],pool[j]]=[pool[j],pool[i]];
+    }
+    return pool.slice(0,3);
+  }
   function candidates(card,bank,field){
     const peers=bank.filter(c=>c&&c.id!==card.id&&c[field]&&c[field]!==card[field]&&
       (field!=='word'||!overlapsMeaning(c.zh,card.zh))&&
@@ -72,8 +82,10 @@
     if(!MODES[mode]||!Array.isArray(selected)||!selected.length||!Array.isArray(bank))throw new Error('不支援的單字測驗模式');
     if(new Set(selected.map(c=>c.id)).size!==selected.length)throw new Error('單字題號重複');
     const collocPool=bank.map(c=>({card:c,entry:collocation(c)})).filter(x=>x.entry);
+    // Mixed mode alternates both directions; its starting direction changes by session.
+    const mixedStart=mode==='mixed'?(random()<.5?'zh-en':'en-zh'):'en-zh';
     return selected.map((card,index)=>{
-      const direction=mode==='mixed'?(index%2===0?'en-zh':'zh-en'):mode;
+      const direction=mode==='mixed'?(index%2===0?mixedStart:(mixedStart==='en-zh'?'zh-en':'en-zh')):mode;
       const entry=collocation(card);
       let question,passage,correct,pool,reasonEn,reason;
       if(direction==='collocation'){
@@ -110,7 +122,7 @@
       }
       const different=[...new Set(pool)].filter(x=>x!==correct);
       if(different.length<3)throw new Error('字卡 '+card.id+' 沒有足夠的有效干擾選項');
-      const choice=shuffleAnswer(correct,different,random);
+      const choice=shuffleAnswer(correct,variedDistractors(different,random),random);
       if(new Set(choice.options).size!==4)throw new Error('選項重複：'+card.id);
       return {id:card.id,part:0,sourceCardId:card.id,tag:card.tag,question,passage,
         options:choice.options,answer:choice.answer,reason,reasonEn};
