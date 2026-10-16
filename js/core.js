@@ -37,7 +37,7 @@
     const reading=raw.readingProgress;
     if(reading&&typeof reading==='object'&&!Array.isArray(reading)){
       for(const [id,r] of Object.entries(reading).slice(0,500)){
-        if(/^(?:r-[a-z-]{1,50}|v4-r-[a-z-]{1,50}|v41-r-[a-z-]{1,50})$/.test(id)&&r&&typeof r==='object'){
+        if(/^(?:r-[a-z-]{1,50}|v4-r-[a-z-]{1,50}|v41-r-[a-z-]{1,50}|v73-r-[a-z-]{1,50})$/.test(id)&&r&&typeof r==='object'){
           out.readingProgress[id]={attempts:clamp(Math.floor(Number(r.attempts)||0),0,10000),
             best:clamp(Math.floor(Number(r.best)||0),0,100),lastAt:typeof r.lastAt==='string'?r.lastAt:''};
         }

@@ -12,7 +12,7 @@ const expectedFrozen=Object.freeze({
   'data/v041_progression.js': '2d0958ac4cd3b618ce460b58e6627dc6ec9280433dd671eae6cf39482e211ba5',
   'data/v042_official.js': 'f47e870da1fb1b43c5e76664a9bfadf805cd53c28bf6a981c723ff0a83822ea4',
   'js/bridge.js': '5c94fc658954466480b25deb6dff6c6537f813d2d17cafe6b956b1b19c5d9fbb',
-  'js/exam.js': '2d1ac55e1a1d41680a103babd99333e0d3144760b29bf56fe3c4530003f5ebc6',
+  'js/exam.js': 'bac74dee75ed6fe0d03d30fd0b476d351362c49b88d4bc32fc8ce5277de057eb',
   'js/quality-v043.js': 'fa5c82cd5161c6ac0730bab0429eb0d24bb733b268ed8c85bd3e3062f96562f2',
 });
 const read=p=>fs.readFileSync(path.join(dir,p),'utf8');

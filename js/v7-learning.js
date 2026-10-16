@@ -90,7 +90,7 @@
       let question,passage,correct,pool,reasonEn,reason;
       if(direction==='collocation'){
         if(!entry)throw new Error('未經校對的搭配詞不能出題：'+card.id);
-        const fill=CLOZE[card.id];
+        const fill=CLOZE[card.id]||(typeof globalThis!=='undefined'?globalThis.ToeicTrainerVarietyV73?.clozeFor(card):null);
         if(fill&&index%2===0){
           question='搭配詞填空：'+fill[0];
           correct=fill[1];pool=fill.slice(2);

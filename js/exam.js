@@ -5,7 +5,8 @@
   const DRAFT_SCHEMA=1;
   const isIndex=i=>Number.isInteger(i)&&i>=0&&i<4;
   const snapshot=q=>({id:q.id,part:q.part,options:q.options,answer:q.answer,question:q.question,passage:q.passage||'',reason:q.reason||'',reasonEn:q.reasonEn||'',
-    docGroup:q.docGroup||'',docType:q.docType||'',sourceCardId:q.sourceCardId||''});
+    docGroup:q.docGroup||'',docType:q.docType||'',sourceCardId:q.sourceCardId||'',
+    tag:q.tag||'',grammarTopic:q.grammarTopic||'',tier:q.tier||'',readingId:q.readingId||'',skill:q.skill||''});
   function validateMock(questions,def){
     const issues=[],lookup=new Map(questions.map(q=>[q.id,q]));
     const groups=['part5','part6','part7single','part7multiple'];
@@ -42,7 +43,8 @@
     const ids=items.map(q=>q.id);if(new Set(ids).size!==ids.length)throw new Error('同份考卷題號重複');
     if(!['reading','grammar','vocab'].includes(context))throw new Error('題型未知');
     return {schema:DRAFT_SCHEMA,createdAt:now,context,mode:mode||context,type,timed:!!timed,durationSeconds:timed?durationSeconds:0,
-       index:0,itemIds:ids,responses:{},vocabItems:type==='vocab'?items.map(snapshot):[],elapsedSeconds:0};
+       index:0,itemIds:ids,responses:{},vocabItems:type==='vocab'?items.map(snapshot):[],
+       ...(type==='question'&&items.some(q=>q.shuffleVersion==='v73')?{questionItems:items.map(snapshot)}:{}),elapsedSeconds:0};
   }
   function answer(draft,id,choice){
     if(!draft||!draft.itemIds.includes(id)||!isIndex(choice))throw new Error('無效題號或選項');
@@ -75,7 +77,19 @@
        !data.responses||typeof data.responses!=='object'||Array.isArray(data.responses)||
        data.timed&&!Number.isFinite(data.durationSeconds))throw new Error('不合格或過期的暫存試卷');
     const dictionary=new Map(questionBank.map(q=>[q.id,q]));
-    const items=data.type==='vocab'?data.vocabItems?.map(v=>({...v})):data.itemIds.map(id=>dictionary.get(id));
+    const reordered= data.type==='question' && Array.isArray(data.questionItems) && data.questionItems.length;
+    const items=data.type==='vocab'?data.vocabItems?.map(v=>({...v})):
+      reordered?data.questionItems.map(q=>({...q,options:[...(q.options||[])]})):data.itemIds.map(id=>dictionary.get(id));
+    if(reordered){
+      for(let i=0;i<data.itemIds.length;i++){
+        const q=items[i],base=dictionary.get(data.itemIds[i]);
+        const norm=x=>String(x??'').normalize('NFKC').trim();
+        if(!q||!base||q.id!==base.id||!isIndex(q.answer)||q.question!==base.question||q.passage!==(base.passage||'')||
+          q.options.length!==4||q.options[q.answer]!==base.options[base.answer]||
+          [...q.options].map(norm).sort().join('\u0001')!==[...base.options].map(norm).sort().join('\u0001'))
+          throw new Error('V7.3 試卷選項快照不符；為保障原紀錄已停止復原');
+      }
+    }
     if(!Array.isArray(items)||items.length!==data.itemIds.length||items.some((q,i)=>q?.id!==data.itemIds[i]||!Array.isArray(q.options)||q.options.length!==4))throw new Error('題目已變更，保留原始紀錄但不自動復原試卷');
     for(const [id,val] of Object.entries(data.responses))if(!data.itemIds.includes(id)||!isIndex(val))throw new Error('暫存答案內容錯誤');
     return {draft:data,items};

@@ -4,24 +4,28 @@
 const Prefs=window.ToeicTrainerPreferences;
 const V7=window.ToeicTrainerV7;
 const Smart=window.ToeicTrainerSmartRandom;
+const V73=window.ToeicTrainerV73Authored, Variety=window.ToeicTrainerVarietyV73;
 const Core=window.ToeicTrainerCore,Content=window.ToeicTrainerContent,Advanced=window.ToeicTrainerAdvanced,Bridge=window.ToeicTrainerBridge,V04=window.ToeicTrainerV04,V041=window.ToeicTrainerV041,V042=window.ToeicTrainerV042,BankAudit=window.ToeicTrainerBankAudit,LengthPolicy=window.ToeicTrainerLengthPolicy,Exam=window.ToeicTrainerExam,Quality=window.ToeicTrainerQuality,Quality043=window.ToeicTrainerQualityV043;
-if(!V7||!Smart||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
+if(!V7||!Smart||!V73||!Variety||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
 const legacyGrammarTopics={deadline:'prepositions','word-form':'word-form',determiner:'word-form',cause:'condition',
   'present-perfect':'tense',comparison:'comparison',collocation:'prepositions',agreement:'agreement',
   infinitive:'infinitive',condition:'condition',passive:'passive'};
-const cards=[...Content.cards,...Advanced.cards,...V04.cards];
-const questions=[...Content.questions.filter(q=>[5,6,7].includes(q.part)).map(q=>({...q,grammarTopic:legacyGrammarTopics[q.tag]||null})),...Advanced.questions,...V04.questions,...V041.questions,...V042.questions];
-const readingLessons=[...Advanced.readingLessons,...V04.readingLessons,...V041.readingLessons],grammarLessons=[...Advanced.grammarLessons,...V04.grammarLessons];
+const cards=Variety.enhanceCards([...Content.cards,...Advanced.cards,...V04.cards]);
+const baseQuestions=[...Content.questions.filter(q=>[5,6,7].includes(q.part)).map(q=>({...q,grammarTopic:legacyGrammarTopics[q.tag]||null})),...Advanced.questions,...V04.questions,...V041.questions,...V042.questions];
+const questions=[...baseQuestions,...V73.questions];
+const baseReadingLessons=[...Advanced.readingLessons,...V04.readingLessons,...V041.readingLessons];
+const readingLessons=[...baseReadingLessons,...V73.readingLessons],grammarLessons=[...Advanced.grammarLessons,...V04.grammarLessons];
 const grammarById=Object.fromEntries(grammarLessons.map(lesson=>[lesson.id,lesson]));
 const readingById=Object.fromEntries(readingLessons.map(lesson=>[lesson.id,lesson]));
 const fatal=Core.validateBank(cards,questions);
-const auditResult=BankAudit.audit({cards,questions,readingLessons,grammarLessons,expected:{cards:800,questions:640,reading:43,grammar:20,part5:368,part6:44,part7:228}});
+const auditResult=BankAudit.audit({cards,questions:baseQuestions,readingLessons:baseReadingLessons,grammarLessons,expected:{cards:800,questions:640,reading:43,grammar:20,part5:368,part6:44,part7:228}});
+const expandedAudit=BankAudit.audit({cards,questions,readingLessons,grammarLessons,expected:{cards:800,questions:737,reading:56,grammar:20,part5:368,part6:76,part7:293}});
 const lengthAudit=LengthPolicy.audit({readingLessons:V041.readingLessons,questions:V041.questions,existingReadingIds:[...Advanced.readingLessons,...V04.readingLessons].map(l=>l.id),existingQuestionIds:[...Content.questions.filter(q=>q.part>=5),...Advanced.questions,...V04.questions].map(q=>q.id)});
-const oldQuestions=questions.filter(q=>!q.id.startsWith('v42-'));
-const quality=Quality.check({legacy:oldQuestions,fresh:V042.questions,reading:readingLessons});
+const oldQuestions=baseQuestions.filter(q=>!q.id.startsWith('v42-'));
+const quality=Quality.check({legacy:oldQuestions,fresh:V042.questions,reading:baseReadingLessons});
 const officialMockAudit=Exam.validateMock(questions,V042.mock);
 const machineAudit=Quality043.inspect({questions,cards,readingLessons,grammarLessons});
-fatal.push(...auditResult.errors,...lengthAudit.errors,...quality.errors,...officialMockAudit.issues,...machineAudit.errors.map(x=>x.id+': '+x.detail));
+fatal.push(...auditResult.errors,...expandedAudit.errors,...lengthAudit.errors,...quality.errors,...officialMockAudit.issues,...machineAudit.errors.map(x=>x.id+': '+x.detail));
 if(fatal.length){document.body.textContent='題庫檢查失敗：'+fatal.slice(0,6).join('; ');return}
 const byId=id=>document.getElementById(id);
 const form=$=>document.querySelector($);
@@ -402,6 +406,7 @@ function renderReadingBrowser(){
   const tier=byId('readingLevelSelect').value||'foundation';
   const phrase=byId('readingSearch').value.trim().toLocaleLowerCase();
   const matches=LengthPolicy.filterLessons(readingLessons,tier).filter(l=>
+    !!phrase || !String(l.id).startsWith('v4-r-')).filter(l=>
     !phrase||[l.title,l.kind,l.level,l.tier].some(s=>String(s||'').toLocaleLowerCase().includes(phrase)));
   const visible=matches.slice(0,(readingListPage+1)*READING_PAGE_SIZE);
   setPressedGroup('#readingLevelTabs [data-reading-level]',tier,'readingLevel');
@@ -501,7 +506,7 @@ function renderPoolHint(){
   const mode=byId('practiceMode').value,part=byId('practicePart').value,tier=byId('practiceTier')?.value||'all';
   const topic=currentTab==='grammar'?quizTopic:null;
   const accepted=(mode==='grammar'?[5,6]:[6,7]);
-  const qs=questions.filter(q=>accepted.includes(q.part)&&(part==='all'||q.part===Number(part))&&(!topic||q.grammarTopic===topic)&&(tier==='all'||(tier==='legacy'?!q.tier:q.tier===tier)));
+  const qs=questions.filter(q=>accepted.includes(q.part)&&(part==='all'||q.part===Number(part))&&(!topic||q.grammarTopic===topic)&&(tier==='all'||(tier==='legacy'?!q.tier:q.tier===tier))&&(mode!=='reading'||!Variety.isOldTemplate(q)));
   byId('practicePoolHint').textContent=`可用 ${qs.length} 道原創題目${topic?' · 本主題':''} · 日常組卷不拆散同篇／跨篇題組，實際題數可能少於指定上限；答案與解析交卷後解鎖。`;
   syncChoiceButtons();
 }
@@ -514,7 +519,7 @@ function startPractice(modeOverride,topicOverride){
   const tier=mode==='mistakes'?'all':byId('practiceTier')?.value||'all';
   let readingId=null;
   if(mode==='reading'&&LengthPolicy.LEVELS[tier]&&(part===null||part===7)){
-    const lessons=LengthPolicy.filterLessons(V041.readingLessons,tier);
+    const lessons=LengthPolicy.filterLessons([...V041.readingLessons,...V73.readingLessons],tier);
     const lesson=Smart.pickReading(lessons,state.questionStats,questions,state.sessions)||
       LengthPolicy.pickNextArticle(lessons,state.questionStats,questions);
     readingId=lesson?.id||null;
@@ -524,11 +529,13 @@ function startPractice(modeOverride,topicOverride){
   const eligible=questions.filter(q=>accepted.includes(q.part)&&(!part||q.part===part)&&
     (!topic||q.grammarTopic===topic)&&(!readingId||q.readingId===readingId)&&
     (tier==='all'||(tier==='legacy'?!q.tier:q.tier===tier))&&
-    (mode!=='mistakes'||Core.inMistakePool(state.questionStats[q.id])));
+    (mode!=='mistakes'||Core.inMistakePool(state.questionStats[q.id]))&&
+    (mode!=='reading'||!Variety.isOldTemplate(q)));
   let items=Smart.pickPractice(eligible,{count:Number(byId('practiceCount').value),
     stats:state.questionStats,sessions:state.sessions,mode});
   if(!items.length&&eligible.length)items=Exam.pickPractice(eligible,{count:Number(byId('practiceCount').value),stats:state.questionStats});
   if(!items.length)return notify('本範圍暫無符合的完整題組；請調整題型、難度或題數。');
+  items=Variety.shuffleOptions(items); // Versioned snapshot in exam.js preserves this exact order on resume.
   // Daily exercises select whole context groups; the requested count is a maximum.
   const context=currentTab==='grammar'?'grammar':'reading';
   const draft=Exam.start(items,{context,mode});draft.part=partRaw;draft.topic=topic;draft.tier=tier;
@@ -539,6 +546,7 @@ function startOfficialMock(){
   if(quiz||readingRun||savedDraft){notify('請先完成或處理舊試卷');return}
   let items;
   try{items=Exam.assembleMock(questions,V042.mock)}catch(e){notify('模考組卷失敗：'+e.message);return}
+  items=Variety.shuffleOptions(items);
   const draft=Exam.start(items,{context:'reading',mode:'official-reading-mock',timed:true,durationSeconds:4500});
   quiz={draft,items,context:'reading',mode:'official-reading-mock',part:'all',topic:null};
   startClock('practice');saveDraft();tab('reading');renderQuiz();revealActiveExam('#practiceSession');
@@ -653,6 +661,7 @@ function finishQuiz(timedOut=false){
      part:source.mode==='official-reading-mock'?null:source.part==='all'?null:Number(source.part),seconds,answered:score.total,
      correct:score.correct,questionIds:reviewItems.map(q=>q.id)});
   event.answerReview=score.decisions.map(d=>({id:d.id,choice:d.choice}));
+  if(source.context!=='vocab')event.questionReview=reviewItems.map(q=>({id:q.id,options:[...q.options],answer:q.answer}));
   if(source.context==='vocab')event.vocabReview=reviewItems.map(q=>({id:q.id,options:q.options,answer:q.answer,
     question:q.question,passage:q.passage,reason:q.reason,reasonEn:q.reasonEn,part:0}));
   if(source.context==='vocab')event.vocabMode=source.draft.vocabMode||'en-zh';
@@ -920,8 +929,18 @@ function showSavedReview(session){
   if(!Array.isArray(session?.answerReview)||!session.answerReview.length)return;
   const lookup=new Map(questions.map(q=>[q.id,q]));
   for(const q of session.vocabReview||[])lookup.set(q.id,q);
+  const savedOrder=new Map((session.questionReview||[]).map(q=>[q.id,q]));
   const seen=[];
-  for(const row of session.answerReview){const q=lookup.get(row.id);if(q)seen.push(q)}
+  for(const row of session.answerReview){
+    const base=lookup.get(row.id),snapshot=savedOrder.get(row.id);
+    if(!base)continue;
+    const valid=snapshot&&Array.isArray(snapshot.options)&&snapshot.options.length===4&&
+      Number.isInteger(snapshot.answer)&&snapshot.answer>=0&&snapshot.answer<4&&
+      snapshot.options[snapshot.answer]===base.options[base.answer]&&
+      [...snapshot.options].sort().join('')===[...base.options].sort().join('');
+    if(snapshot&&!valid){notify('歷史答案順序資料不符，已停止展示以免誤導');return}
+    seen.push(valid?{...base,options:[...snapshot.options],answer:snapshot.answer}:base);
+  }
   if(!seen.length)return notify('這份試卷的題目已不在目前版本，請先保存舊版備份');
   const chosen=new Map(session.answerReview.map(x=>[x.id,x.choice]));
   const decisions=seen.map(q=>({id:q.id,choice:chosen.get(q.id),correct:chosen.get(q.id)===q.answer}));
