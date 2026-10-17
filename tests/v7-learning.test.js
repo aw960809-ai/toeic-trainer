@@ -102,7 +102,7 @@ assert.equal(cssBaseline.files['css/v7-learning.css'].important,0);
 assert.equal(cssBaseline.files['css/v7-learning.css'].duplicate_scoped_rules,0);
 assert.equal(cssBaseline.files['css/v7-learning.css'].duplicate_declarations,0);
 assert(app.includes('V7.questions(selected,')&&app.includes('V7.analyzeSentence(sentence.en)'));
-assert(app.includes('source.context===\'vocab\'')&&app.includes('Core.nextReview('),'old SRS is still used');
+assert(app.includes('source.context===\'vocab\'') && app.includes('Review.recordVocab(') && app.includes('Core.nextReview,') && read('js/review-v74.js').includes('coreNextReview(previous,'), 'legacy SRS remains wired through V7.4');
 assert(app.includes("event.vocabMode=source.draft.vocabMode"));
 assert(sw.includes("'./js/v7-learning.js'")&&sw.includes("'./css/v7-learning.css'"));
 assert(!app.includes('localStorage.clear('));

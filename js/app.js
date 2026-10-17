@@ -4,9 +4,10 @@
 const Prefs=window.ToeicTrainerPreferences;
 const V7=window.ToeicTrainerV7;
 const Smart=window.ToeicTrainerSmartRandom;
+const Review=window.ToeicTrainerReviewV74;
 const V73=window.ToeicTrainerV73Authored, Variety=window.ToeicTrainerVarietyV73;
 const Core=window.ToeicTrainerCore,Content=window.ToeicTrainerContent,Advanced=window.ToeicTrainerAdvanced,Bridge=window.ToeicTrainerBridge,V04=window.ToeicTrainerV04,V041=window.ToeicTrainerV041,V042=window.ToeicTrainerV042,BankAudit=window.ToeicTrainerBankAudit,LengthPolicy=window.ToeicTrainerLengthPolicy,Exam=window.ToeicTrainerExam,Quality=window.ToeicTrainerQuality,Quality043=window.ToeicTrainerQualityV043;
-if(!V7||!Smart||!V73||!Variety||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
+if(!V7||!Smart||!Review||!V73||!Variety||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
 const legacyGrammarTopics={deadline:'prepositions','word-form':'word-form',determiner:'word-form',cause:'condition',
   'present-perfect':'tense',comparison:'comparison',collocation:'prepositions',agreement:'agreement',
   infinitive:'infinitive',condition:'condition',passive:'passive'};
@@ -277,7 +278,7 @@ function totalSeconds(){return state.sessions.reduce((a,s)=>a+Math.max(0,Number(
 function totalAnswers(){return questions.reduce((a,q)=>a+(Number(state.questionStats[q.id]?.correct)||0)+(Number(state.questionStats[q.id]?.wrong)||0),0)}
 function totalCorrect(){return questions.reduce((a,q)=>a+(Number(state.questionStats[q.id]?.correct)||0),0)}
 function countDue(){return cards.filter(c=>Core.reviewIsDue(state.review[c.id])).length}
-function mistakeQuestions(){return questions.filter(q=>Core.inMistakePool(state.questionStats[q.id]))}
+function mistakeQuestions(){return questions.filter(q=>Review.isDue(state.questionStats[q.id]))}
 function statCard(label,value){return `<div class="metric"><b>${esc(value)}</b><span>${esc(label)}</span></div>`}
 function renderHome(){
   const ans=totalAnswers(),right=totalCorrect();
@@ -505,9 +506,9 @@ function updateReadingLevelOptions(){
 function renderPoolHint(){
   const mode=byId('practiceMode').value,part=byId('practicePart').value,tier=byId('practiceTier')?.value||'all';
   const topic=currentTab==='grammar'?quizTopic:null;
-  const accepted=(mode==='grammar'?[5,6]:[6,7]);
-  const qs=questions.filter(q=>accepted.includes(q.part)&&(part==='all'||q.part===Number(part))&&(!topic||q.grammarTopic===topic)&&(tier==='all'||(tier==='legacy'?!q.tier:q.tier===tier))&&(mode!=='reading'||!Variety.isOldTemplate(q)));
-  byId('practicePoolHint').textContent=`可用 ${qs.length} 道原創題目${topic?' · 本主題':''} · 日常組卷不拆散同篇／跨篇題組，實際題數可能少於指定上限；答案與解析交卷後解鎖。`;
+  const accepted=(mode==='mistakes'?[5,6,7]:mode==='grammar'?[5,6]:[6,7]);
+  const qs=questions.filter(q=>accepted.includes(q.part)&&(part==='all'||q.part===Number(part))&&(!topic||q.grammarTopic===topic)&&(tier==='all'||(tier==='legacy'?!q.tier:q.tier===tier))&&(mode!=='reading'||!Variety.isOldTemplate(q))&&(mode!=='mistakes'||Review.isDue(state.questionStats[q.id])));
+  byId('practicePoolHint').textContent=`可用 ${qs.length} 道${mode==='mistakes'?'已到期錯題':'原創題目'}${topic?' · 本主題':''} · 日常組卷不拆散同篇／跨篇題組，實際題數可能少於指定上限；答案與解析交卷後解鎖。`;
   syncChoiceButtons();
 }
 function startPractice(modeOverride,topicOverride){
@@ -529,16 +530,46 @@ function startPractice(modeOverride,topicOverride){
   const eligible=questions.filter(q=>accepted.includes(q.part)&&(!part||q.part===part)&&
     (!topic||q.grammarTopic===topic)&&(!readingId||q.readingId===readingId)&&
     (tier==='all'||(tier==='legacy'?!q.tier:q.tier===tier))&&
-    (mode!=='mistakes'||Core.inMistakePool(state.questionStats[q.id]))&&
+    (mode!=='mistakes'||Review.isDue(state.questionStats[q.id]))&&
     (mode!=='reading'||!Variety.isOldTemplate(q)));
-  let items=Smart.pickPractice(eligible,{count:Number(byId('practiceCount').value),
-    stats:state.questionStats,sessions:state.sessions,mode});
-  if(!items.length&&eligible.length)items=Exam.pickPractice(eligible,{count:Number(byId('practiceCount').value),stats:state.questionStats});
-  if(!items.length)return notify('本範圍暫無符合的完整題組；請調整題型、難度或題數。');
-  items=Variety.shuffleOptions(items); // Versioned snapshot in exam.js preserves this exact order on resume.
-  // Daily exercises select whole context groups; the requested count is a maximum.
+  const requested=Number(byId('practiceCount').value)||10;
+  let items=[],reviewPairs=[];
+  if(mode==='mistakes'){
+    // Strictly due originals come first. Reserve room for same-skill items from
+    // other passages/contexts; do not manufacture paraphrases or repeat IDs.
+    items=Smart.pickPractice(eligible,{count:Math.max(1,Math.floor(requested*.7)),
+      stats:state.questionStats,sessions:state.sessions,mode});
+    if(!items.length)items=Smart.pickPractice(eligible,{count:requested,
+      stats:state.questionStats,sessions:state.sessions,mode});
+    if(!items.length&&eligible.length)items=Exam.pickPractice(eligible,{count:requested,stats:state.questionStats});
+    if(items.length<requested){
+      const priority=items.slice().sort((a,b)=>Review.stage(state.questionStats[b.id])-Review.stage(state.questionStats[a.id]));
+      const selected=Review.chooseVariations(priority,questions,state.questionStats,{
+        count:Math.min(requested-items.length,Math.max(1,Math.floor(requested*.3))),
+        sessions:state.sessions,allowed:q=>!Variety.isOldTemplate(q)});
+      reviewPairs=selected.pairs;
+      items=items.concat(selected.items);
+    }
+    if(items.length<requested){
+      const chosen=new Set(items.map(q=>q.id));
+      const more=Smart.pickPractice(eligible.filter(q=>!chosen.has(q.id)),{
+        count:requested-items.length,stats:state.questionStats,sessions:state.sessions,mode});
+      items=items.concat(more);
+    }
+  }else{
+    items=Smart.pickPractice(eligible,{count:requested,stats:state.questionStats,sessions:state.sessions,mode});
+    if(!items.length&&eligible.length)items=Exam.pickPractice(eligible,{count:requested,stats:state.questionStats});
+  }
+  if(!items.length){
+    const due=Review.nextDue(state.questionStats);
+    const date=due?new Date(due).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+    return notify(mode==='mistakes'?(date?'目前沒有到期錯題，下次：'+date:'目前沒有到期錯題'):'本範圍暫無符合的完整題組；請調整題型、難度或題數。');
+  }
+  items=Variety.shuffleOptions(items); // Existing versioned snapshots preserve the choices.
+  // Review pairs travel with the draft, so a paused/resumed exam grades identically.
   const context=currentTab==='grammar'?'grammar':'reading';
   const draft=Exam.start(items,{context,mode});draft.part=partRaw;draft.topic=topic;draft.tier=tier;
+  if(mode==='mistakes')draft.reviewPairs=reviewPairs;
   quiz={items,draft,context,mode,part:partRaw,topic};
   startClock('practice');saveDraft();renderQuiz();revealActiveExam('#practiceSession');
 }
@@ -572,13 +603,14 @@ function renderQuiz(){
   if(isVocab){vocabView='test';syncVocabView();vView.hidden=false;byId('vocabIntro').hidden=true;pView.hidden=true}
   else{vView.hidden=true;pView.hidden=false;byId('practiceSetup').hidden=true;byId('practiceFinished').hidden=true}
   const {draft,items}=quiz,q=items[draft.index],choice=draft.responses[q.id];
+  const variantQuestion=draft.mode==='mistakes'&&Array.isArray(draft.reviewPairs)&&draft.reviewPairs.some(p=>p.variantId===q.id);
   if(!q)return;
   const complete=Exam.completed(draft),total=items.length;
   const clockText=draft.timed?`剩餘 ${timeStr(Math.max(0,draft.durationSeconds-Exam.elapsed(draft)))}`:timeStr(active?.seconds);
   let html=`<div class="panel exam-panel"><div class="session-head"><span>第 ${draft.index+1}/${total} 題 · 已答 ${complete} 題</span><div class="timer" id="quizTimer">${clockText}</div></div>`;
   html+=`<div class="progress"><i style="width:${Math.round(100*complete/total)}%"></i></div>`;
   html+=`<div class="exam-banner">交卷後顯示解析</div>`;
-  html+=`<div class="question-label">${isVocab?'VOCABULARY':`PART ${q.part} · ${esc(names[q.part])}`} · ${esc(q.tag||'Context')} ${q.docType?' · '+(q.docType==='double'?'雙篇閱讀':'三篇閱讀'):''}</div>`;
+  html+=`<div class="question-label">${isVocab?'VOCABULARY':`PART ${q.part} · ${esc(names[q.part])}`} · ${esc(q.tag||'Context')} ${q.docType?' · '+(q.docType==='double'?'雙篇閱讀':'三篇閱讀'):''}${variantQuestion?' · 同考點變化題':''}</div>`;
   if(q.passage)html+=`<div class="passage" lang="en">${esc(q.passage)}</div>`;
   html+=`<div class="q-stem" lang="${isVocab?'zh-Hant':'en'}">${esc(q.question)}</div><div class="answers">`;
   q.options.forEach((option,i)=>{
@@ -652,10 +684,23 @@ function finishQuiz(timedOut=false){
   const seconds=source.draft.timed?Math.min(source.draft.durationSeconds,Exam.elapsed(source.draft)):Math.round(active?.seconds||0);
   const reviewItems=source.items,old=state;
   const next=Core.normalized(JSON.parse(JSON.stringify(state)));
+  const answerMap=new Map(score.decisions.map(d=>[d.id,d]));
+  const reviewLinks=new Map((source.draft.reviewPairs||[])
+    .filter(p=>p&&typeof p.originalId==='string'&&typeof p.variantId==='string')
+    .map(p=>[p.originalId,p.variantId]));
+  const markedAt=new Date();
   for(const decision of score.decisions){
     if(decision.choice===null)continue;
-    if(source.context==='vocab')next.review[decision.id]=Core.nextReview(next.review[decision.id],decision.correct?'good':'again');
-    else next.questionStats[decision.id]=Core.recordAnswer(next.questionStats[decision.id],decision.correct);
+    if(source.context==='vocab'){
+      next.review[decision.id]=Review.recordVocab(next.review[decision.id],decision.correct,Core.nextReview,markedAt);
+    }else{
+      // The final stage can only be closed when a linked variant was also
+      // answered correctly. If no alternate exists, normal due review applies.
+      const siblingId=reviewLinks.get(decision.id);
+      const masteryConfirmed=!siblingId||answerMap.get(siblingId)?.correct===true;
+      next.questionStats[decision.id]=Review.recordWritten(next.questionStats[decision.id],
+        decision.correct,markedAt,{masteryConfirmed});
+    }
   }
   const event=Core.createSession({id:idNew(),date:Core.dateKey(new Date()),mode:source.mode,unit:unitForQuiz(source),
      part:source.mode==='official-reading-mock'?null:source.part==='all'?null:Number(source.part),seconds,answered:score.total,
@@ -849,7 +894,7 @@ function finishReadingLesson(){
   const {lesson,draft}=readingRun,qs=questions.filter(q=>q.readingId===lesson.id);
   let score;try{score=Exam.score(draft,qs)}catch(e){notify(e.message);return}
   const seconds=Math.round(active?.seconds||0),old=state,next=Core.normalized(JSON.parse(JSON.stringify(state)));
-  for(const decision of score.decisions)next.questionStats[decision.id]=Core.recordAnswer(next.questionStats[decision.id],decision.correct);
+  for(const decision of score.decisions)next.questionStats[decision.id]=Review.recordWritten(next.questionStats[decision.id],decision.correct);
   const event=Core.createSession({id:idNew(),date:Core.dateKey(new Date()),mode:'guided-reading',unit:'article',part:7,
     seconds,answered:score.total,correct:score.correct,questionIds:qs.map(q=>q.id)});
   event.answerReview=score.decisions.map(d=>({id:d.id,choice:d.choice}));
@@ -883,7 +928,10 @@ function finishReadingLesson(){
 function renderMistakes(){
   const pool=mistakeQuestions();
   const allWrong=questions.filter(q=>Number(state.questionStats[q.id]?.wrong)>0).length;
-  byId('mistakesMetrics').innerHTML=statCard('仍需再練',pool.length+' 題')+statCard('曾經答錯',allWrong+' 題')+statCard('題庫題目',questions.length+' 題')+statCard('已學單字',Object.keys(state.review).length+' 張');
+  const waiting=questions.filter(q=>Review.reviewStatus(state.questionStats[q.id])==='waiting').length;
+  const mastered=questions.filter(q=>Review.reviewStatus(state.questionStats[q.id])==='mastered').length;
+  byId('mistakesMetrics').innerHTML=statCard('今日到期',pool.length+' 題')+statCard('排程中',waiting+' 題')+
+    statCard('已掌握',mastered+' 題')+statCard('曾經答錯',allWrong+' 題');
   byId('startMistakes').disabled=!pool.length;
   const weak=Core.weakTopics(questions,state.questionStats).filter(x=>x.answered>=2);
   const weakBox=byId('weaknessOverview');weakBox.hidden=!weak.length;
@@ -893,11 +941,17 @@ function renderMistakes(){
       '<p class="fineprint">僅依目前訓練紀錄計算，不是正式多益能力分數。</p>';
   }
   const list=byId('mistakesList');
-  if(!pool.length){list.innerHTML='<div class="empty">目前沒有待重練的閱讀或文法題。先完成一般練習，再回來檢視。</div>';return}
+  const nextAt=Review.nextDue(state.questionStats);
+  const nextText=nextAt?new Date(nextAt).toLocaleString('zh-TW',{
+    timeZone:'Asia/Taipei',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+  if(!pool.length){
+    list.innerHTML=`<div class="empty">目前沒有到期錯題${nextText?'，下次預定：'+esc(nextText):'，可先練習新題'}。</div>`;
+    return;
+  }
   list.innerHTML=pool.slice(0,30).map(q=>{
     const stats=state.questionStats[q.id];
-    return `<div class="list-row"><div><b>Part ${q.part} · ${esc(q.question)}</b><small>${esc(q.tag)} · 曾錯 ${Number(stats.wrong)||0} 次</small></div><span class="pill warn">待複習</span></div>`;
-  }).join('');
+    return `<div class="list-row"><div><b>Part ${q.part} · ${esc(q.question)}</b><small>${esc(q.tag||'')} · 曾錯 ${Number(stats.wrong)||0} 次 · ${esc(Review.reviewLabel(stats))}</small></div><span class="pill warn">已到期</span></div>`;
+  }).join('')+(nextText?`<p class="fineprint">其餘錯題下次複習：${esc(nextText)}</p>`:'');
 }
 function downloadJSON(data,filename){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
