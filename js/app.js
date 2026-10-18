@@ -688,21 +688,38 @@ function finishQuiz(timedOut=false){
   const reviewLinks=new Map((source.draft.reviewPairs||[])
     .filter(p=>p&&typeof p.originalId==='string'&&typeof p.variantId==='string')
     .map(p=>[p.originalId,p.variantId]));
-  const markedAt=new Date();
-  for(const decision of score.decisions){
+   const markedAt=new Date();
+   // Immutable submitted-session evidence for result-first Goal Manager.
+   // The original scoring, SRS scheduler and persisted answer IDs are unchanged.
+   const reviewDueIds=[],reviewCorrectIds=[],reviewMasteredIds=[];
+   for(const decision of score.decisions){
     if(decision.choice===null)continue;
-    if(source.context==='vocab'){
-      next.review[decision.id]=Review.recordVocab(next.review[decision.id],decision.correct,Core.nextReview,markedAt);
-    }else{
+     if(source.context==='vocab'){
+       const before=next.review[decision.id];
+       const due=before&&Number(before.times)>0&&before.dueAt&&Date.parse(before.dueAt)<=markedAt.getTime();
+       if(source.mode==='vocabulary'&&due){
+         reviewDueIds.push(decision.id);
+         if(decision.correct)reviewCorrectIds.push(decision.id);
+       }
+       next.review[decision.id]=Review.recordVocab(before,decision.correct,Core.nextReview,markedAt);
+     }else{
       // The final stage can only be closed when a linked variant was also
       // answered correctly. If no alternate exists, normal due review applies.
-      const siblingId=reviewLinks.get(decision.id);
-      const masteryConfirmed=!siblingId||answerMap.get(siblingId)?.correct===true;
-      next.questionStats[decision.id]=Review.recordWritten(next.questionStats[decision.id],
-        decision.correct,markedAt,{masteryConfirmed});
-    }
-  }
-  const event=Core.createSession({id:idNew(),date:Core.dateKey(new Date()),mode:source.mode,unit:unitForQuiz(source),
+       const siblingId=reviewLinks.get(decision.id);
+       const masteryConfirmed=!siblingId||answerMap.get(siblingId)?.correct===true;
+       const before=next.questionStats[decision.id];
+       const due=source.mode==='mistakes'&&Review.isDue(before,markedAt);
+       const oldMastered=before?.mastered===true;
+       next.questionStats[decision.id]=Review.recordWritten(before,
+         decision.correct,markedAt,{masteryConfirmed});
+       if(due){
+         reviewDueIds.push(decision.id);
+         if(decision.correct)reviewCorrectIds.push(decision.id);
+         if(!oldMastered&&next.questionStats[decision.id].mastered===true)reviewMasteredIds.push(decision.id);
+       }
+     }
+   }
+   const event=Core.createSession({id:idNew(),date:Core.dateKey(new Date()),mode:source.mode,unit:unitForQuiz(source),
      part:source.mode==='official-reading-mock'?null:source.part==='all'?null:Number(source.part),seconds,answered:score.total,
      correct:score.correct,questionIds:reviewItems.map(q=>q.id)});
   event.answerReview=score.decisions.map(d=>({id:d.id,choice:d.choice}));
@@ -710,8 +727,13 @@ function finishQuiz(timedOut=false){
   if(source.context==='vocab')event.vocabReview=reviewItems.map(q=>({id:q.id,options:q.options,answer:q.answer,
     question:q.question,passage:q.passage,reason:q.reason,reasonEn:q.reasonEn,part:0}));
   if(source.context==='vocab')event.vocabMode=source.draft.vocabMode||'en-zh';
-  event.unanswered=score.unanswered;event.timedOut=timedOut;
-  next.sessions.push(event);state=next;
+   event.unanswered=score.unanswered;event.timedOut=timedOut;
+   if(source.mode==='mistakes'||source.context==='vocab'){
+     event.reviewDueIds=reviewDueIds;
+     event.reviewCorrectIds=reviewCorrectIds;
+     event.reviewMasteredIds=reviewMasteredIds;
+   }
+   next.sessions.push(event);state=next;
   if(!persist()){state=old;notify('無法保存交卷結果，原本試卷及紀錄均已保留');return}
   window.ToeicTrainerAutoSync?.notifyCompleted(event,{window});
   quiz=null;endClock();deleteDraft();window.speechSynthesis?.cancel();
