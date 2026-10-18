@@ -5,6 +5,7 @@ const Prefs=window.ToeicTrainerPreferences;
 const V7=window.ToeicTrainerV7;
 const Smart=window.ToeicTrainerSmartRandom;
 const Review=window.ToeicTrainerReviewV74;
+const ReviewCatalog=window.ToeicReviewCatalogV76;
 const V73=window.ToeicTrainerV73Authored, Variety=window.ToeicTrainerVarietyV73;
 const Core=window.ToeicTrainerCore,Content=window.ToeicTrainerContent,Advanced=window.ToeicTrainerAdvanced,Bridge=window.ToeicTrainerBridge,V04=window.ToeicTrainerV04,V041=window.ToeicTrainerV041,V042=window.ToeicTrainerV042,BankAudit=window.ToeicTrainerBankAudit,LengthPolicy=window.ToeicTrainerLengthPolicy,Exam=window.ToeicTrainerExam,Quality=window.ToeicTrainerQuality,Quality043=window.ToeicTrainerQualityV043;
 if(!V7||!Smart||!Review||!V73||!Variety||!Prefs||!Core||!Content||!Advanced||!Bridge||!V04||!V041||!V042||!BankAudit||!LengthPolicy||!Exam||!Quality||!Quality043){document.body.textContent='閱讀、單字、文法或題庫資料載入失敗，請重新開啟程式。';return}
@@ -1194,7 +1195,13 @@ function tick(){
   }
   if((quiz||readingRun)&&Math.floor(active.seconds)>=15&&Math.floor(active.seconds)%15===0&&active.lastSavedDraftAt!==Math.floor(active.seconds)){active.lastSavedDraftAt=Math.floor(active.seconds);saveDraft();}
 }
-bootStorage();attach();tab('home');renderDraftBanner();
+bootStorage();
+// Public bank identifiers are optional metadata, never required to practice.
+try{
+ if(!ReviewCatalog||!ReviewCatalog.publish(window.localStorage,window.location,questions,cards))
+   console.warn('Review bank index unavailable; Goal Manager will show an unverified queue.');
+}catch(error){console.warn('Review bank index was not published',error)}
+attach();tab('home');renderDraftBanner();
 const qualityLabel=byId('qualityStatus');if(qualityLabel)qualityLabel.textContent=machineAudit.counts.mechanicallyBlocked===0?`640 題結構通過 · ${machineAudit.counts.flaggedForReview} 題優先覆核`:'題庫需安全處理';
 const bankInfo=byId('bankQuality');if(bankInfo)bankInfo.textContent=`題庫：${auditResult.counts.words} 張獨立字卡、${auditResult.counts.questions} 道書面題（Part 5：${auditResult.counts.part5}；Part 6：${auditResult.counts.part6}；Part 7：${auditResult.counts.part7}）、${auditResult.counts.reading} 篇精讀及 ${auditResult.counts.grammar} 個文法主題。V0.4.3 已完成 ${machineAudit.counts.questions} 道題的程式化結構審核；${machineAudit.counts.flaggedForReview} 題列為優先人工語意覆核（可能涉及原文依據、解析或干擾選項）。尚未宣稱全部答案經專家驗證；題目均非 ETS 官方試題。`;
 })();
