@@ -50,9 +50,53 @@ const stillMastered = Review.recordWritten(record, true, after(t4, 2 * DAY));
 assert.equal(stillMastered.mastered, true);
 const relapsed = Review.recordWritten(stillMastered, false, after(t4, 3 * DAY));
 assert.equal(relapsed.mastered, false);
-assert.equal(relapsed.reviewStage, 0);
-assert.equal(relapsed.dueAt, after(after(t4, 3 * DAY), 10 * MINUTE).toISOString());
+assert.equal(relapsed.reviewStage, 3, 'mastered mistake returns to the previous 7-day stage');
+assert.equal(relapsed.dueAt, after(after(t4, 3 * DAY), 7 * DAY).toISOString());
 assert.equal(relapsed.wrong, 2);
+
+// V7.7 rollback matrix: errors retreat one stage without erasing saved accuracy.
+// The first mistake starts at 10 minutes; repeated errors at stage 0 stay there.
+const rollbackCases = [
+  { stage: -1, previous: null, next: 0, delay: 10 * MINUTE },
+  { stage: 0, previous: { reviewStage: 0 }, next: 0, delay: 10 * MINUTE },
+  { stage: 1, previous: { reviewStage: 1 }, next: 0, delay: 10 * MINUTE },
+  { stage: 2, previous: { reviewStage: 2 }, next: 1, delay: DAY },
+  { stage: 3, previous: { reviewStage: 3 }, next: 2, delay: 3 * DAY },
+  { stage: 4, previous: { reviewStage: 4, mastered: true, masteryAt: t.toISOString() }, next: 3, delay: 7 * DAY }
+];
+for (const c of rollbackCases) {
+  const before = c.previous && {
+    correct: 5, wrong: 2, streak: 4, dueAt: t.toISOString(),
+    historyMarker: 'keep', ...c.previous
+  };
+  const saved = before && JSON.parse(JSON.stringify(before));
+  const result = Review.recordWritten(before, false, t);
+  assert.equal(result.reviewStage, c.next, 'wrong stage ' + c.stage);
+  assert.equal(result.dueAt, after(t, c.delay).toISOString(), 'retry interval ' + c.stage);
+  assert.equal(result.mastered, false);
+  assert.equal(result.masteryPending, false);
+  assert.equal(result.masteryAt, null);
+  assert.equal(result.streak, 0);
+  assert.equal(result.correct, before ? 5 : 0, 'do not erase prior correct attempts');
+  assert.equal(result.wrong, before ? 3 : 1, 'append error history');
+  assert(Review.isDue(result, after(t, c.delay)));
+  assert(!Review.isDue(result, after(t, c.delay - 1)));
+  if (before) {
+    assert.equal(result.historyMarker, 'keep', 'keep legacy/custom fields');
+    assert.deepEqual(before, saved, 'input records are immutable');
+  }
+  const recovered = Review.recordWritten(result, true, after(t, c.delay));
+  assert.equal(recovered.reviewStage, c.next + 1, 'successful due review advances one level');
+}
+// Retesting early cannot advance a previously demoted item, but a wrong answer
+// still sends that one item back one level (without touching unrelated items).
+const unrelated = { wrong: 1, reviewStage: 3, dueAt: t.toISOString() };
+const earlyWrong = Review.recordWritten({ wrong: 1, reviewStage: 2,
+  dueAt: after(t, 5 * DAY).toISOString() }, false, t);
+assert.equal(earlyWrong.reviewStage, 1);
+assert.equal(earlyWrong.dueAt, after(t, DAY).toISOString());
+assert.deepEqual(unrelated, { wrong: 1, reviewStage: 3, dueAt: t.toISOString() });
+
 
 // Last-stage success needs correct evidence from a linked variant if one exists.
 const pending = Review.recordWritten({ wrong: 1, correct: 3, streak: 3,

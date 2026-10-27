@@ -50,8 +50,11 @@
       lastAt: at.toISOString()
     };
     if (!correct) {
-      return { ...stats, reviewStage: 0, mastered: false, masteryAt: null,
-        masteryPending: false, dueAt: new Date(at.getTime() + STAGES[0]).toISOString() };
+      // A failed review steps back exactly one stage; it never resets all progress.
+      // -1 (unseen) and 0 remain at 0; mastered (4) steps back to 3.
+      const retryStage = Math.max(0, Math.max(0, oldStage) - 1);
+      return { ...stats, reviewStage: retryStage, mastered: false, masteryAt: null,
+        masteryPending: false, dueAt: new Date(at.getTime() + STAGES[retryStage]).toISOString() };
     }
     if (oldStage === -1) {
       // Never create a mistake review just because an unseen question was answered correctly.
